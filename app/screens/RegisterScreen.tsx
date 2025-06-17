@@ -19,11 +19,17 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    if (!name.trim()) {
+      Alert.alert('Error', 'Please enter your name');
       return;
     }
 
@@ -34,6 +40,9 @@ export default function RegisterScreen() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            name: name.trim(),
+          },
         },
       });
 
@@ -112,6 +121,13 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={name}
+            onChangeText={setName}
+            autoCapitalize="words"
+          />
           <TextInput
             style={styles.input}
             placeholder="Email"

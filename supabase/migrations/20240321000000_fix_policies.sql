@@ -9,6 +9,7 @@ GRANT ALL ON public.group_members TO authenticated;
 GRANT ALL ON public.activities TO authenticated;
 GRANT ALL ON public.votes TO authenticated;
 GRANT ALL ON public.balances TO authenticated;
+GRANT ALL ON public.group_invites TO authenticated;
 
 -- Grant usage on sequences
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
@@ -33,6 +34,9 @@ DROP POLICY IF EXISTS "Votes are viewable by group creator" ON public.votes;
 DROP POLICY IF EXISTS "Users can create votes" ON public.votes;
 DROP POLICY IF EXISTS "Balances are viewable by group members" ON public.balances;
 DROP POLICY IF EXISTS "Balances are viewable by group creator" ON public.balances;
+DROP POLICY IF EXISTS "Group invites are viewable by group creator" ON public.group_invites;
+DROP POLICY IF EXISTS "Group creator can create invites" ON public.group_invites;
+DROP POLICY IF EXISTS "Group creator can update invites" ON public.group_invites;
 
 -- Enable RLS on all tables
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -41,6 +45,7 @@ ALTER TABLE public.group_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.balances ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.group_invites ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for users table
 CREATE POLICY "Users are viewable by everyone" ON public.users
@@ -113,5 +118,30 @@ CREATE POLICY "Balances are viewable by group creator" ON public.balances
         EXISTS (
             SELECT 1 FROM public.groups g
             WHERE g.id = balances.group_id AND g.created_by = auth.uid()
+        )
+    );
+
+-- Create RLS policies for group_invites table
+CREATE POLICY "Group invites are viewable by group creator" ON public.group_invites
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.groups g
+            WHERE g.id = group_invites.group_id AND g.created_by = auth.uid()
+        )
+    );
+
+CREATE POLICY "Group creator can create invites" ON public.group_invites
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.groups g
+            WHERE g.id = group_invites.group_id AND g.created_by = auth.uid()
+        )
+    );
+
+CREATE POLICY "Group creator can update invites" ON public.group_invites
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.groups g
+            WHERE g.id = group_invites.group_id AND g.created_by = auth.uid()
         )
     ); 

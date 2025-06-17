@@ -36,11 +36,19 @@ type Member = {
 
 type Activity = {
   id: string;
-  name: string;
-  description: string | null;
+  group_id: string;
+  user_id: string;
+  type: 'exercise' | 'excuse' | 'auto_excuse';
+  exercise_type?: string;
+  duration_minutes?: number;
+  excuse_category?: string;
+  excuse_text?: string;
   date: string;
-  status: 'pending' | 'completed' | 'cancelled';
-  created_by: string;
+  status: 'pending' | 'valid' | 'invalid';
+  user: {
+    name: string;
+    avatar_url?: string;
+  };
 };
 
 export default function GroupDetailsScreen() {
@@ -93,7 +101,13 @@ export default function GroupDetailsScreen() {
       // Fetch activities
       const { data: activitiesData, error: activitiesError } = await supabase
         .from('activities')
-        .select('*')
+        .select(`
+          *,
+          user:users (
+            name,
+            avatar_url
+          )
+        `)
         .eq('group_id', id)
         .order('date', { ascending: false });
 
@@ -138,6 +152,13 @@ export default function GroupDetailsScreen() {
             <MaterialCommunityIcons name="cog" size={24} color="#6B7280" />
           </TouchableOpacity>
         )}
+        <TouchableOpacity
+          style={styles.voteButton}
+          onPress={() => router.push(`/groups/${id}/vote`)}
+        >
+          <MaterialCommunityIcons name="vote" size={24} color="#fff" />
+          <Text style={styles.voteButtonText}>Votar</Text>
+        </TouchableOpacity>
       </View>
 
       {group.description && (
@@ -171,7 +192,7 @@ export default function GroupDetailsScreen() {
           )}
         </View>
         {activities.length === 0 ? (
-          <Text style={styles.emptyText}>Nenhuma atividade agendada</Text>
+          <Text style={styles.emptyText}>Nenhuma atividade registrada</Text>
         ) : (
           activities.map((activity) => (
             <TouchableOpacity
@@ -180,23 +201,58 @@ export default function GroupDetailsScreen() {
               onPress={() => router.push(`/groups/${id}/activities/${activity.id}`)}
             >
               <View style={styles.activityInfo}>
-                <Text style={styles.activityName}>{activity.name}</Text>
-                <Text style={styles.activityDate}>
-                  {new Date(activity.date).toLocaleDateString()}
-                </Text>
+                <View style={styles.activityHeader}>
+                  <Text style={styles.userName}>{activity.user.name}</Text>
+                  <Text style={styles.activityDate}>
+                    {new Date(activity.date).toLocaleDateString()}
+                  </Text>
+                </View>
+                {activity.type === 'exercise' ? (
+                  <View>
+                    <Text style={styles.activityType}>
+                      {activity.exercise_type}
+                    </Text>
+                    <Text style={styles.activityDuration}>
+                      {activity.duration_minutes} minutos
+                    </Text>
+                  </View>
+                ) : (
+                  <View>
+                    <Text style={styles.excuseCategory}>
+                      {activity.excuse_category}
+                    </Text>
+                    {activity.excuse_text && (
+                      <Text style={styles.excuseText}>{activity.excuse_text}</Text>
+                    )}
+                  </View>
+                )}
               </View>
               <View style={[
                 styles.statusBadge,
-                { backgroundColor: activity.status === 'completed' ? '#10B981' : '#F59E0B' }
+                { 
+                  backgroundColor: 
+                    activity.status === 'valid' ? '#10B981' : 
+                    activity.status === 'invalid' ? '#EF4444' : 
+                    '#F59E0B'
+                }
               ]}>
                 <Text style={styles.statusText}>
-                  {activity.status === 'completed' ? 'Concluída' : 'Pendente'}
+                  {activity.status === 'valid' ? 'Válido' : 
+                   activity.status === 'invalid' ? 'Inválido' : 
+                   'Pendente'}
                 </Text>
               </View>
             </TouchableOpacity>
           ))
         )}
       </View>
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => router.push(`/groups/${id}/post`)}
+      >
+        <MaterialCommunityIcons name="plus" size={24} color="#fff" />
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -226,7 +282,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
@@ -313,10 +371,34 @@ const styles = StyleSheet.create({
   activityInfo: {
     flex: 1,
   },
-  activityName: {
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  activityType: {
     fontSize: 16,
     color: '#1F2937',
     marginBottom: 4,
+  },
+  activityDuration: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  excuseCategory: {
+    fontSize: 16,
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  excuseText: {
+    fontSize: 14,
+    color: '#6B7280',
   },
   activityDate: {
     fontSize: 14,
@@ -337,5 +419,38 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
     paddingVertical: 20,
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF6B35',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  voteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  voteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
 }); 

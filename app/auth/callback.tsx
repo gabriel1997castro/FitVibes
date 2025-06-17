@@ -22,6 +22,7 @@ export default function AuthCallback() {
             .upsert({
               id: session.user.id,
               email: session.user.email,
+              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             });

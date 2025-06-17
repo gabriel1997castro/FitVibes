@@ -92,12 +92,22 @@ export default function GroupListScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Meus Grupos</Text>
-        <TouchableOpacity
-          style={styles.createButton}
-          onPress={() => router.push('/groups/create')}
-        >
-          <MaterialCommunityIcons name="plus" size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push('/join')}
+          >
+            <MaterialCommunityIcons name="account-plus" size={24} color="#FF6B35" />
+            <Text style={styles.headerButtonText}>Entrar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push('/groups/create')}
+          >
+            <MaterialCommunityIcons name="plus" size={24} color="#FF6B35" />
+            <Text style={styles.headerButtonText}>Criar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {groups.length === 0 ? (
@@ -150,13 +160,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1F2937',
   },
-  createButton: {
-    backgroundColor: '#FF6B35',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  headerButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  headerButtonText: {
+    color: '#FF6B35',
+    fontSize: 16,
+    fontWeight: '600',
   },
   listContent: {
     padding: 20,
