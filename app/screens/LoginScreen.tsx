@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, Platform } from 'react-native';
 import { supabase } from '../services/supabase';
+import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -12,15 +13,21 @@ export default function LoginScreen() {
   const [signUpPassword, setSignUpPassword] = useState('');
   const [signUpName, setSignUpName] = useState('');
   const [signingUp, setSigningUp] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      Alert.alert('Login Error', error.message);
-    } else {
-      Alert.alert('Success', 'Logged in!');
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,205 +50,197 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    Alert.alert('Google Login', 'Google login not implemented yet.');
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
+      if (error) throw error;
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAppleLogin = () => {
-    Alert.alert('Apple Login', 'Apple login not implemented yet.');
+  const handleAppleLogin = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+      });
+      if (error) throw error;
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.gradientBg}>
-      <View style={styles.container}>
-        {/* Logo Placeholder */}
-        <View style={styles.logoCircle}>
-          <Text style={styles.logoText}>🏋️‍♂️</Text>
-        </View>
-        <Text style={styles.appName}>FitVibes</Text>
-        <Text style={styles.slogan}>Treine com a galera, entre na vibe fit!</Text>
-        <View style={styles.buttonGroup}>
-          <TouchableOpacity style={[styles.loginButton, styles.google]} onPress={handleGoogleLogin}>
-            <Text style={styles.buttonText}>Entrar com Google</Text>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>FitVibes</Text>
+        <Text style={styles.subtitle}>Treine com a galera, entre na vibe fit!</Text>
+
+        <View style={styles.form}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.loginButtonText}>
+              {loading ? 'Entrando...' : 'Entrar'}
+            </Text>
           </TouchableOpacity>
-          {Platform.OS === 'ios' && (
-            <TouchableOpacity style={[styles.loginButton, styles.apple]} onPress={handleAppleLogin}>
-              <Text style={styles.buttonText}>Entrar com Apple</Text>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>ou</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={handleGoogleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.socialButtonText}>Continuar com Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={handleAppleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.socialButtonText}>Continuar com Apple</Text>
+          </TouchableOpacity>
+
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>Não tem uma conta? </Text>
+            <TouchableOpacity onPress={() => router.push('/register')}>
+              <Text style={styles.registerLink}>Cadastre-se</Text>
             </TouchableOpacity>
-          )}
-          <TouchableOpacity style={[styles.loginButton, styles.email]} onPress={() => setShowEmailForm(true)}>
-            <Text style={styles.buttonText}>Entrar com E-mail</Text>
-          </TouchableOpacity>
+          </View>
         </View>
-        <Modal visible={showEmailForm} animationType="slide" transparent>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Login com E-mail</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-              <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} disabled={loading} />
-              <Button title="Criar conta" onPress={() => { setShowEmailForm(false); setShowSignUp(true); }} color="#FF6B35" />
-              <Button title="Cancelar" onPress={() => setShowEmailForm(false)} color="#888" />
-            </View>
-          </View>
-        </Modal>
-        <Modal visible={showSignUp} animationType="slide" transparent>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Criar conta</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nome"
-                autoCapitalize="words"
-                value={signUpName}
-                onChangeText={setSignUpName}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                autoCapitalize="none"
-                keyboardType="email-address"
-                value={signUpEmail}
-                onChangeText={setSignUpEmail}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                secureTextEntry
-                value={signUpPassword}
-                onChangeText={setSignUpPassword}
-              />
-              <Button title={signingUp ? 'Criando conta...' : 'Criar conta'} onPress={handleSignUp} disabled={signingUp} />
-              <Button title="Cancelar" onPress={() => setShowSignUp(false)} color="#888" />
-            </View>
-          </View>
-        </Modal>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradientBg: {
-    flex: 1,
-    backgroundColor: 'linear-gradient(135deg, #FF6B35 0%, #8B5CF6 100%)', // fallback for web
-    ...Platform.select({
-      ios: { backgroundColor: '#FF6B35' },
-      android: { backgroundColor: '#FF6B35' },
-      default: {},
-    }),
-  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  logoText: {
-    fontSize: 40,
-  },
-  appName: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
-    textShadowColor: '#0002',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 4,
-  },
-  slogan: {
-    fontSize: 16,
-    color: '#fff',
-    marginBottom: 32,
-    textAlign: 'center',
-    textShadowColor: '#0002',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  buttonGroup: {
-    width: '100%',
-    maxWidth: 320,
-    marginBottom: 16,
-  },
-  loginButton: {
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  google: {
-    backgroundColor: '#fff',
-  },
-  apple: {
-    backgroundColor: '#000',
-  },
-  email: {
     backgroundColor: '#FF6B35',
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#222',
-  },
-  modalOverlay: {
+  content: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
   },
-  modalContent: {
-    width: '90%',
-    maxWidth: 340,
+  title: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 48,
+  },
+  form: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
+    padding: 20,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#FF6B35',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   input: {
-    width: '100%',
-    height: 48,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 16,
-    paddingHorizontal: 12,
     fontSize: 16,
+  },
+  loginButton: {
+    backgroundColor: '#FF6B35',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: '#666',
+    fontSize: 16,
+  },
+  socialButton: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  socialButtonText: {
+    fontSize: 16,
+    color: '#1F2937',
+    fontWeight: '500',
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  registerText: {
+    color: '#666',
+    fontSize: 16,
+  },
+  registerLink: {
+    color: '#FF6B35',
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 

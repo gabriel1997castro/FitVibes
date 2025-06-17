@@ -10,6 +10,7 @@
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy"
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.1.0",
     "@supabase/supabase-js": "^2.50.0",
     "expo": "^53.0.4",
     "expo-constants": "~17.1.4",
