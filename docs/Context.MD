@@ -341,33 +341,29 @@ CREATE INDEX idx_balances_user_id ON balances(user_id);
 
 ```
 fitvibes/
-├── src/
-│   ├── app/                      # App entry point and configuration
-│   │   ├── App.tsx
-│   │   ├── store.ts             # Zustand store configuration
-│   │   └── theme.ts             # Theme configuration
-│   ├── assets/                   # Static assets (fonts, images, animations)
-│   ├── components/               # Reusable UI components
-│   │   ├── common/
-│   │   ├── forms/
-│   │   └── layout/
-│   ├── features/                 # Feature-specific logic (auth, groups, activities, voting, achievements)
-│   ├── hooks/                    # Custom React hooks
-│   ├── navigation/               # Navigation configuration
-│   ├── screens/                  # Screen components (auth, groups, activities, profile)
-│   ├── services/                 # API and external services
-│   ├── store/                    # Zustand/state management
-│   ├── types/                    # TypeScript type definitions
-│   └── utils/                    # Utility functions
-├── android/                      # Android specific files
-├── ios/                          # iOS specific files
-├── __tests__/                    # Test files
-├── .env                          # Environment variables
-├── app.json                      # Expo configuration
-├── babel.config.js               # Babel configuration
-├── package.json                  # Dependencies and scripts
-├── tsconfig.json                 # TypeScript configuration
-└── README.md                     # Project documentation
+├── app/                      # App entry point and configuration
+│   ├── index.tsx             # Main entry (welcome/login)
+│   ├── _layout.tsx           # Expo Router layout
+│   ├── store.ts              # Zustand store configuration
+│   ├── theme.ts              # Theme configuration
+│   ├── services/             # API and external services
+│   ├── screens/              # Screen components (auth, groups, activities, profile)
+│   ├── components/           # Reusable UI components
+│   ├── features/             # Feature-specific logic (auth, groups, activities, voting, achievements)
+│   ├── hooks/                # Custom React hooks
+│   ├── navigation/           # Navigation configuration
+│   ├── store/                # Zustand/state management
+│   ├── types/                # TypeScript type definitions
+│   └── utils/                # Utility functions
+├── android/                  # Android specific files
+├── ios/                      # iOS specific files
+├── __tests__/                # Test files
+├── .env                      # Environment variables
+├── app.json                  # Expo configuration
+├── babel.config.js           # Babel configuration
+├── package.json              # Dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
+└── README.md                 # Project documentation
 ``` 
 
 ## 🚀 Development Roadmap
