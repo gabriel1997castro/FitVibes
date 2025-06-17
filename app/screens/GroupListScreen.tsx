@@ -38,8 +38,11 @@ export default function GroupListScreen() {
 
       const { data, error } = await supabase
         .from('groups')
-        .select('*')
-        .eq('created_by', user.id);
+        .select(`
+          *,
+          group_members!inner(user_id)
+        `)
+        .eq('group_members.user_id', user.id);
 
       if (error) throw error;
 
