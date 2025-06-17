@@ -7,6 +7,11 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpName, setSignUpName] = useState('');
+  const [signingUp, setSigningUp] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -16,6 +21,25 @@ export default function LoginScreen() {
       Alert.alert('Login Error', error.message);
     } else {
       Alert.alert('Success', 'Logged in!');
+    }
+  };
+
+  const handleSignUp = async () => {
+    setSigningUp(true);
+    const { error } = await supabase.auth.signUp({
+      email: signUpEmail,
+      password: signUpPassword,
+      options: { data: { name: signUpName } },
+    });
+    setSigningUp(false);
+    if (error) {
+      Alert.alert('Erro ao criar conta', error.message);
+    } else {
+      setShowSignUp(false);
+      setSignUpEmail('');
+      setSignUpPassword('');
+      setSignUpName('');
+      Alert.alert('Sucesso', 'Conta criada! Verifique seu e-mail para confirmar.');
     }
   };
 
@@ -69,7 +93,39 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
               />
               <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} disabled={loading} />
+              <Button title="Criar conta" onPress={() => { setShowEmailForm(false); setShowSignUp(true); }} color="#FF6B35" />
               <Button title="Cancelar" onPress={() => setShowEmailForm(false)} color="#888" />
+            </View>
+          </View>
+        </Modal>
+        <Modal visible={showSignUp} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Criar conta</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Nome"
+                autoCapitalize="words"
+                value={signUpName}
+                onChangeText={setSignUpName}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={signUpEmail}
+                onChangeText={setSignUpEmail}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                secureTextEntry
+                value={signUpPassword}
+                onChangeText={setSignUpPassword}
+              />
+              <Button title={signingUp ? 'Criando conta...' : 'Criar conta'} onPress={handleSignUp} disabled={signingUp} />
+              <Button title="Cancelar" onPress={() => setShowSignUp(false)} color="#888" />
             </View>
           </View>
         </Modal>
