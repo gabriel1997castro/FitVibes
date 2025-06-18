@@ -87,7 +87,14 @@ export default function VoteScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      const { error } = await supabase
+      // Check if user is trying to vote on their own activity
+      if (activities[currentIndex].user_id === user.id) {
+        Alert.alert('Erro', 'Você não pode votar na sua própria atividade.');
+        return;
+      }
+
+      // Insert the vote
+      const { error: voteError } = await supabase
         .from('votes')
         .insert({
           activity_id: activities[currentIndex].id,
@@ -96,7 +103,45 @@ export default function VoteScreen() {
           comment_type: commentId,
         });
 
-      if (error) throw error;
+      if (voteError) throw voteError;
+
+      // Get total number of group members
+      const { data: groupMembers, error: membersError } = await supabase
+        .from('group_members')
+        .select('id')
+        .eq('group_id', id);
+
+      if (membersError) throw membersError;
+
+      // Get total number of votes for this activity
+      const { data: votes, error: votesError } = await supabase
+        .from('votes')
+        .select('id')
+        .eq('activity_id', activities[currentIndex].id);
+
+      if (votesError) throw votesError;
+
+      // If all members have voted (except the activity owner), update activity status
+      if (votes.length === groupMembers.length - 1) { // Subtract 1 to exclude the activity owner
+        // Count valid votes
+        const { data: validVotes, error: validVotesError } = await supabase
+          .from('votes')
+          .select('id')
+          .eq('activity_id', activities[currentIndex].id)
+          .eq('is_valid', true);
+
+        if (validVotesError) throw validVotesError;
+
+        // Update activity status based on majority vote
+        const { error: updateError } = await supabase
+          .from('activities')
+          .update({
+            status: validVotes.length > votes.length / 2 ? 'valid' : 'invalid'
+          })
+          .eq('id', activities[currentIndex].id);
+
+        if (updateError) throw updateError;
+      }
 
       // Move to next activity
       if (currentIndex < activities.length - 1) {

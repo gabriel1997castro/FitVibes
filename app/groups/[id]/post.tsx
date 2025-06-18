@@ -45,61 +45,6 @@ export default function PostActivityScreen() {
   const [selectedExcuse, setSelectedExcuse] = useState<string | null>(null);
   const [excuseText, setExcuseText] = useState('');
 
-  useEffect(() => {
-    const checkAndCreateAutoExcuse = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Check if user already has an activity for today
-        const { data: existingActivity } = await supabase
-          .from('activities')
-          .select('id')
-          .eq('group_id', id)
-          .eq('user_id', user.id)
-          .eq('date', new Date().toISOString().split('T')[0])
-          .single();
-
-        if (!existingActivity) {
-          // Create auto-excuse
-          const { error } = await supabase
-            .from('activities')
-            .insert({
-              group_id: id,
-              user_id: user.id,
-              type: 'auto_excuse',
-              excuse_category: 'other',
-              excuse_text: AUTO_EXCUSE_TEXT,
-              date: new Date().toISOString().split('T')[0],
-              status: 'pending'
-            });
-
-          if (error) {
-            console.error('Error creating auto-excuse:', error);
-          }
-        }
-      } catch (error) {
-        console.error('Error in auto-excuse check:', error);
-      }
-    };
-
-    // Check at midnight
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-
-    const timeUntilMidnight = tomorrow.getTime() - now.getTime();
-
-    // Set timeout for midnight check
-    const timeoutId = setTimeout(checkAndCreateAutoExcuse, timeUntilMidnight);
-
-    // Also check immediately in case the user opens the app after midnight
-    checkAndCreateAutoExcuse();
-
-    return () => clearTimeout(timeoutId);
-  }, [id]);
-
   const handlePost = async () => {
     if (!type) {
       Alert.alert('Erro', 'Selecione se você treinou ou não');
@@ -125,6 +70,20 @@ export default function PostActivityScreen() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
+
+      // Check if user already has an activity for today
+      const { data: existingActivity } = await supabase
+        .from('activities')
+        .select('id')
+        .eq('group_id', id)
+        .eq('user_id', user.id)
+        .eq('date', new Date().toISOString().split('T')[0])
+        .single();
+
+      if (existingActivity) {
+        Alert.alert('Erro', 'Você já postou uma atividade hoje neste grupo.');
+        return;
+      }
 
       const { error } = await supabase
         .from('activities')
