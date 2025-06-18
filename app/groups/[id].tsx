@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -53,16 +53,18 @@ type Activity = {
 
 export default function GroupDetailsScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const { id, refresh } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState<Group | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    fetchGroupDetails();
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchGroupDetails();
+    }, [id, refresh])
+  );
 
   const fetchGroupDetails = async () => {
     try {

@@ -93,54 +93,82 @@ export default function VoteScreen() {
         return;
       }
 
-      // Insert the vote
+      // Insert vote
       const { error: voteError } = await supabase
         .from('votes')
         .insert({
           activity_id: activities[currentIndex].id,
           voter_id: user.id,
-          is_valid: isValid,
-          comment_type: commentId,
+          is_valid: isValid
         });
 
-      if (voteError) throw voteError;
+      if (voteError) {
+        console.error('Error inserting vote:', voteError);
+        throw voteError;
+      }
 
-      // Get total number of group members
+      console.log('Vote inserted successfully');
+
+      // Get total number of group members (excluding the activity owner)
       const { data: groupMembers, error: membersError } = await supabase
         .from('group_members')
-        .select('id')
-        .eq('group_id', id);
+        .select('id, user_id')
+        .eq('group_id', id)
+        .neq('user_id', activities[currentIndex].user_id); // Exclude the activity owner
 
-      if (membersError) throw membersError;
+      if (membersError) {
+        console.error('Error fetching group members:', membersError);
+        throw membersError;
+      }
 
-      // Get total number of votes for this activity
+      console.log('Group members (excluding owner):', groupMembers);
+
+      // Get all votes for this activity
       const { data: votes, error: votesError } = await supabase
         .from('votes')
-        .select('id')
+        .select('id, is_valid')
         .eq('activity_id', activities[currentIndex].id);
 
-      if (votesError) throw votesError;
+      if (votesError) {
+        console.error('Error fetching votes:', votesError);
+        throw votesError;
+      }
+
+      console.log('All votes for activity:', votes);
+
+      // Debug: Log votes and activity
+      console.log('Activity:', activities[currentIndex].id);
+      console.log('Group members (excluding owner):', groupMembers.length);
+      console.log('Total votes:', votes.length);
+      console.log('Votes:', votes);
 
       // If all members have voted (except the activity owner), update activity status
-      if (votes.length === groupMembers.length - 1) { // Subtract 1 to exclude the activity owner
+      if (votes.length === groupMembers.length) { // Subtract 1 to exclude the activity owner
         // Count valid votes
-        const { data: validVotes, error: validVotesError } = await supabase
-          .from('votes')
-          .select('id')
-          .eq('activity_id', activities[currentIndex].id)
-          .eq('is_valid', true);
-
-        if (validVotesError) throw validVotesError;
+        const validVotes = votes.filter(vote => vote.is_valid).length;
+        console.log('Valid votes count:', validVotes);
+        console.log('Total votes count:', votes.length);
 
         // Update activity status based on majority vote
         const { error: updateError } = await supabase
           .from('activities')
           .update({
-            status: validVotes.length > votes.length / 2 ? 'valid' : 'invalid'
+            status: validVotes > votes.length / 2 ? 'valid' : 'invalid'
           })
           .eq('id', activities[currentIndex].id);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('Error updating activity status:', updateError);
+          throw updateError;
+        }
+
+        console.log('Activity status updated successfully');
+      } else {
+        console.log('Not enough votes to update status:', {
+          votesCount: votes.length,
+          requiredVotes: groupMembers.length,
+          groupMembersCount: groupMembers.length
+        });
       }
 
       // Move to next activity
