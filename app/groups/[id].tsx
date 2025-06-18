@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  FlatList,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
@@ -140,122 +141,102 @@ export default function GroupDetailsScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.groupInfo}>
-          <Text style={styles.groupEmoji}>{group.emoji}</Text>
-          <Text style={styles.groupName}>{group.name}</Text>
-        </View>
-        {isAdmin && (
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.groupName}>{group?.name}</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.balanceButton}
+            onPress={() => router.push(`/groups/${id}/balance`)}
+          >
+            <Text style={styles.balanceButtonText}>Ver Saldos</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.settingsButton}
             onPress={() => router.push(`/groups/${id}/settings`)}
           >
-            <MaterialCommunityIcons name="cog" size={24} color="#6B7280" />
+            <Text style={styles.settingsButtonText}>⚙️</Text>
           </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={styles.voteButton}
-          onPress={() => router.push(`/groups/${id}/vote`)}
-        >
-          <MaterialCommunityIcons name="vote" size={24} color="#fff" />
-          <Text style={styles.voteButtonText}>Votar</Text>
-        </TouchableOpacity>
-      </View>
-
-      {group.description && (
-        <Text style={styles.description}>{group.description}</Text>
-      )}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Membros</Text>
-        {members.map((member) => (
-          <View key={member.id} style={styles.memberItem}>
-            <View style={styles.memberInfo}>
-              <Text style={styles.memberName}>{member.users.name}</Text>
-              {member.role === 'admin' && (
-                <Text style={styles.adminBadge}>Admin</Text>
-              )}
-            </View>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Atividades</Text>
-          {isAdmin && (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => router.push(`/groups/${id}/activities/create`)}
-            >
-              <MaterialCommunityIcons name="plus" size={20} color="#fff" />
-            </TouchableOpacity>
-          )}
         </View>
-        {activities.length === 0 ? (
-          <Text style={styles.emptyText}>Nenhuma atividade registrada</Text>
-        ) : (
-          activities.map((activity) => (
-            <TouchableOpacity
-              key={activity.id}
-              style={styles.activityItem}
-              onPress={() => router.push(`/groups/${id}/activities/${activity.id}`)}
-            >
-              <View style={styles.activityInfo}>
-                <View style={styles.activityHeader}>
-                  <Text style={styles.userName}>{activity.user.name}</Text>
+      </View>
+
+      <FlatList
+        data={[{ key: 'content' }]}
+        renderItem={() => (
+          <>
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Membros</Text>
+              </View>
+              {members.map((member) => (
+                <View key={member.id} style={styles.memberItem}>
+                  <Text style={styles.memberName}>{member.users.name}</Text>
+                  <Text style={styles.memberRole}>{member.role === 'admin' ? 'Admin' : 'Membro'}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Atividades</Text>
+                <View style={styles.sectionActions}>
+                  <TouchableOpacity
+                    style={styles.voteButton}
+                    onPress={() => router.push(`/groups/${id}/vote`)}
+                  >
+                    <Text style={styles.voteButtonText}>Votar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {activities.map((activity) => (
+                <View key={activity.id} style={styles.activityItem}>
+                  <View style={styles.activityHeader}>
+                    <Text style={styles.activityUser}>{activity.user.name}</Text>
+                    <View style={[
+                      styles.statusBadge,
+                      { backgroundColor: activity.status === 'valid' ? '#D1FAE5' : '#FEE2E2' }
+                    ]}>
+                      <Text style={[
+                        styles.statusText,
+                        { color: activity.status === 'valid' ? '#059669' : '#DC2626' }
+                      ]}>
+                        {activity.status === 'valid' ? 'Válido' : 'Inválido'}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={styles.activityType}>
+                    {activity.type === 'exercise' ? 'Exercício' : 'Desculpa'}
+                  </Text>
+                  {activity.type === 'exercise' && (
+                    <Text style={styles.activityDetails}>
+                      {activity.exercise_type} - {activity.duration_minutes} minutos
+                    </Text>
+                  )}
+                  {activity.type === 'excuse' && (
+                    <Text style={styles.activityDetails}>
+                      {activity.excuse_category}
+                    </Text>
+                  )}
                   <Text style={styles.activityDate}>
                     {new Date(activity.date).toLocaleDateString()}
                   </Text>
                 </View>
-                {activity.type === 'exercise' ? (
-                  <View>
-                    <Text style={styles.activityType}>
-                      {activity.exercise_type}
-                    </Text>
-                    <Text style={styles.activityDuration}>
-                      {activity.duration_minutes} minutos
-                    </Text>
-                  </View>
-                ) : (
-                  <View>
-                    <Text style={styles.excuseCategory}>
-                      {activity.excuse_category}
-                    </Text>
-                    {activity.excuse_text && (
-                      <Text style={styles.excuseText}>{activity.excuse_text}</Text>
-                    )}
-                  </View>
-                )}
-              </View>
-              <View style={[
-                styles.statusBadge,
-                { 
-                  backgroundColor: 
-                    activity.status === 'valid' ? '#10B981' : 
-                    activity.status === 'invalid' ? '#EF4444' : 
-                    '#F59E0B'
-                }
-              ]}>
-                <Text style={styles.statusText}>
-                  {activity.status === 'valid' ? 'Válido' : 
-                   activity.status === 'invalid' ? 'Inválido' : 
-                   'Pendente'}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))
+              ))}
+            </View>
+          </>
         )}
-      </View>
-
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => router.push(`/groups/${id}/post`)}
-      >
-        <MaterialCommunityIcons name="plus" size={24} color="#fff" />
-      </TouchableOpacity>
-    </ScrollView>
+        ListFooterComponent={() => (
+          <View style={styles.bottomContainer}>
+            <TouchableOpacity
+              style={styles.floatingButton}
+              onPress={() => router.push(`/groups/${id}/post`)}
+            >
+              <Text style={styles.floatingButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
@@ -280,7 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -290,160 +271,110 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  groupInfo: {
+  groupName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
-  groupEmoji: {
-    fontSize: 32,
-    marginRight: 12,
+  balanceButton: {
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
-  groupName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1F2937',
+  balanceButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
   settingsButton: {
     padding: 8,
   },
-  description: {
-    fontSize: 16,
-    color: '#6B7280',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+  settingsButtonText: {
+    fontSize: 24,
   },
   section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    marginBottom: 24,
+    paddingTop: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
+    paddingHorizontal: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1F2937',
   },
-  addButton: {
-    backgroundColor: '#FF6B35',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
+  sectionActions: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
   },
   memberItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    padding: 12,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-  },
-  memberInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   memberName: {
     fontSize: 16,
     color: '#1F2937',
   },
-  adminBadge: {
-    fontSize: 12,
-    color: '#FF6B35',
-    marginLeft: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: '#FFF5F2',
+  memberRole: {
+    fontSize: 14,
+    color: '#6B7280',
   },
   activityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
+    padding: 12,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-  },
-  activityInfo: {
-    flex: 1,
   },
   activityHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  userName: {
+  activityUser: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
   activityType: {
     fontSize: 16,
     color: '#1F2937',
     marginBottom: 4,
   },
-  activityDuration: {
+  activityDetails: {
     fontSize: 14,
     color: '#6B7280',
-  },
-  excuseCategory: {
-    fontSize: 16,
-    color: '#1F2937',
     marginBottom: 4,
-  },
-  excuseText: {
-    fontSize: 14,
-    color: '#6B7280',
   },
   activityDate: {
     fontSize: 14,
     color: '#6B7280',
   },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: '500',
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    paddingVertical: 20,
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FF6B35',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
   voteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#FF6B35',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -451,8 +382,38 @@ const styles = StyleSheet.create({
   },
   voteButtonText: {
     color: '#fff',
-    fontSize: 16,
     fontWeight: '600',
-    marginLeft: 8,
+  },
+  bottomContainer: {
+    height: 80,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingRight: 24,
+    paddingBottom: 12,
+  },
+  floatingButton: {
+    backgroundColor: '#FF6B35',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  floatingButtonText: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '600',
+    lineHeight: 32,
   },
 }); 

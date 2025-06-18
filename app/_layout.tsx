@@ -15,8 +15,8 @@ export default function Layout() {
         // Redirect to the sign-in page if not signed in
         router.replace('/login');
       } else if (session && isAuthRoute) {
-        // Redirect to the home page if signed in
-        router.replace('/');
+        // Redirect to the tab bar if signed in
+        router.replace('/(tabs)/groups');
       }
     });
 
@@ -27,8 +27,8 @@ export default function Layout() {
         // Redirect to the sign-in page if not signed in
         router.replace('/login');
       } else if (session && isAuthRoute) {
-        // Redirect to the home page if signed in
-        router.replace('/');
+        // Redirect to the tab bar if signed in
+        router.replace('/(tabs)/groups');
       }
     });
   }, [segments]);
@@ -36,7 +36,7 @@ export default function Layout() {
   return (
     <Stack>
       <Stack.Screen
-        name="index"
+        name="(tabs)"
         options={{
           headerShown: false,
         }}
