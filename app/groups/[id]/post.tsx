@@ -10,10 +10,12 @@ import {
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { checkAndAwardStreakAchievements, checkAndAwardVarietyAchievements } from '../../features/achievements';
 
 const EXERCISE_TYPES = [
   { id: 'walking', name: 'Caminhada', icon: 'walk' },
@@ -35,6 +37,14 @@ const EXCUSE_CATEGORIES = [
 
 const AUTO_EXCUSE_TEXT = "Hoje não treinei porque fui muito migué! 😅";
 
+interface UserGroup {
+  group_id: string;
+  group_name: string;
+  group_emoji: string;
+  theme_color: string;
+  is_member: boolean;
+}
+
 export default function PostActivityScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -44,6 +54,70 @@ export default function PostActivityScreen() {
   const [duration, setDuration] = useState('');
   const [selectedExcuse, setSelectedExcuse] = useState<string | null>(null);
   const [excuseText, setExcuseText] = useState('');
+  const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([id as string]); // Current group is pre-selected
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [tempSelectedGroups, setTempSelectedGroups] = useState<string[]>([id as string]);
+
+  // Fetch user's groups on component mount
+  useEffect(() => {
+    fetchUserGroups();
+  }, []);
+
+  const fetchUserGroups = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase.rpc('get_user_groups_for_posting', {
+        p_user_id: user.id
+      });
+
+      if (error) throw error;
+      setUserGroups(data || []);
+    } catch (error) {
+      console.error('Error fetching user groups:', error);
+    } finally {
+      setLoadingGroups(false);
+    }
+  };
+
+  const openGroupModal = () => {
+    setTempSelectedGroups([...selectedGroups]);
+    setShowGroupModal(true);
+  };
+
+  const closeGroupModal = () => {
+    setShowGroupModal(false);
+  };
+
+  const confirmGroupSelection = () => {
+    setSelectedGroups([...tempSelectedGroups]);
+    setShowGroupModal(false);
+  };
+
+  const toggleGroupInModal = (groupId: string) => {
+    setTempSelectedGroups(prev => {
+      if (prev.includes(groupId)) {
+        return prev.filter(id => id !== groupId);
+      } else {
+        return [...prev, groupId];
+      }
+    });
+  };
+
+  const selectAllGroups = () => {
+    setTempSelectedGroups(userGroups.map(group => group.group_id));
+  };
+
+  const getCurrentGroup = () => {
+    return userGroups.find(group => group.group_id === id);
+  };
+
+  const getSelectedGroupsInfo = () => {
+    return userGroups.filter(group => selectedGroups.includes(group.group_id));
+  };
 
   const handlePost = async () => {
     if (!type) {
@@ -66,43 +140,42 @@ export default function PostActivityScreen() {
       return;
     }
 
+    if (selectedGroups.length === 0) {
+      Alert.alert('Erro', 'Selecione pelo menos um grupo');
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Check if user already has an activity for today
-      const { data: existingActivity } = await supabase
-        .from('activities')
-        .select('id')
-        .eq('group_id', id)
-        .eq('user_id', user.id)
-        .eq('date', new Date().toISOString().split('T')[0])
-        .single();
-
-      if (existingActivity) {
-        Alert.alert('Erro', 'Você já postou uma atividade hoje neste grupo.');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('activities')
-        .insert({
-          group_id: id,
-          user_id: user.id,
-          type,
-          exercise_type: type === 'exercise' ? selectedExercise : null,
-          duration_minutes: type === 'exercise' ? parseInt(duration) : null,
-          excuse_category: type === 'excuse' ? selectedExcuse : null,
-          excuse_text: type === 'excuse' ? excuseText : null,
-          date: new Date().toISOString().split('T')[0],
-        });
+      // Use the new multi-group function
+      const { data, error } = await supabase.rpc('create_activity_for_multiple_groups', {
+        p_user_id: user.id,
+        p_groups: selectedGroups,
+        p_type: type,
+        p_exercise_type: type === 'exercise' ? selectedExercise : null,
+        p_duration_minutes: type === 'exercise' ? parseInt(duration) : null,
+        p_excuse_category: type === 'excuse' ? selectedExcuse : null,
+        p_excuse_text: type === 'excuse' ? excuseText : null,
+        p_date: new Date().toISOString().split('T')[0],
+      });
 
       if (error) throw error;
 
+      // Check and award achievements for each group
+      for (const groupId of selectedGroups) {
+        await checkAndAwardStreakAchievements(user.id, groupId);
+        await checkAndAwardVarietyAchievements(user.id, groupId);
+      }
+
+      const groupCount = selectedGroups.length;
+      const groupText = groupCount === 1 ? 'grupo' : 'grupos';
+      
       Alert.alert(
         'Sucesso',
-        'Atividade registrada com sucesso!',
+        `Atividade registrada com sucesso em ${groupCount} ${groupText}!`,
         [
           {
             text: 'OK',
@@ -118,12 +191,15 @@ export default function PostActivityScreen() {
     }
   };
 
+  const currentGroup = getCurrentGroup();
+  const selectedGroupsInfo = getSelectedGroupsInfo();
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 40 }}>
         <Text style={styles.title}>Você treinou hoje?</Text>
 
         <View style={styles.typeSelector}>
@@ -160,12 +236,13 @@ export default function PostActivityScreen() {
           <View style={styles.exerciseSection}>
             <Text style={styles.sectionTitle}>Tipo de Exercício</Text>
             <View style={styles.exerciseGrid}>
-              {EXERCISE_TYPES.map((exercise) => (
+              {EXERCISE_TYPES.map((exercise, idx) => (
                 <TouchableOpacity
                   key={exercise.id}
                   style={[
                     styles.exerciseButton,
                     selectedExercise === exercise.id && styles.selectedExercise,
+                    idx % 2 === 0 && { marginRight: 12 },
                   ]}
                   onPress={() => setSelectedExercise(exercise.id)}
                 >
@@ -201,12 +278,13 @@ export default function PostActivityScreen() {
           <View style={styles.excuseSection}>
             <Text style={styles.sectionTitle}>Categoria da Desculpa</Text>
             <View style={styles.excuseGrid}>
-              {EXCUSE_CATEGORIES.map((excuse) => (
+              {EXCUSE_CATEGORIES.map((excuse, idx) => (
                 <TouchableOpacity
                   key={excuse.id}
                   style={[
                     styles.excuseButton,
                     selectedExcuse === excuse.id && styles.selectedExcuse,
+                    idx % 2 === 0 && { marginRight: 12 },
                   ]}
                   onPress={() => setSelectedExcuse(excuse.id)}
                 >
@@ -239,6 +317,36 @@ export default function PostActivityScreen() {
           </View>
         )}
 
+        {/* Clean group selection section */}
+        {type && (
+          <View style={styles.groupSection}>
+            {selectedGroups.length === 1 && currentGroup && (
+              <View style={styles.currentGroupCard}>
+                <Text style={styles.groupEmoji}>{currentGroup.group_emoji}</Text>
+                <Text style={styles.groupName}>{currentGroup.group_name}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity onPress={openGroupModal} style={styles.addGroupsLink}>
+              <Text style={styles.addGroupsText}>Adicionar outros grupos</Text>
+            </TouchableOpacity>
+
+            {selectedGroups.length > 1 && (
+              <View style={styles.selectedGroupsChips}>
+                <Text style={styles.chipsTitle}>Postando para:</Text>
+                <View style={styles.chipsContainer}>
+                  {selectedGroupsInfo.map((group) => (
+                    <View key={group.group_id} style={styles.chip}>
+                      <Text style={styles.chipEmoji}>{group.group_emoji}</Text>
+                      <Text style={styles.chipText}>{group.group_name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+
         <TouchableOpacity
           style={[styles.postButton, loading && styles.disabledButton]}
           onPress={handlePost}
@@ -249,11 +357,77 @@ export default function PostActivityScreen() {
           ) : (
             <>
               <MaterialCommunityIcons name="send" size={24} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.postButtonText}>Enviar</Text>
+              <Text style={styles.postButtonText}>
+                {selectedGroups.length > 1 
+                  ? `Enviar em ${selectedGroups.length} grupos` 
+                  : 'Enviar'
+                }
+              </Text>
             </>
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Group Selection Modal */}
+      <Modal
+        visible={showGroupModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeGroupModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Selecionar Grupos</Text>
+              <TouchableOpacity onPress={closeGroupModal}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity onPress={selectAllGroups} style={styles.selectAllButton}>
+              <Text style={styles.selectAllText}>Selecionar todos</Text>
+            </TouchableOpacity>
+
+            <ScrollView style={styles.modalGroupList}>
+              {userGroups.map((group) => (
+                <TouchableOpacity
+                  key={group.group_id}
+                  style={[
+                    styles.modalGroupItem,
+                    tempSelectedGroups.includes(group.group_id) && styles.selectedModalGroup,
+                  ]}
+                  onPress={() => toggleGroupInModal(group.group_id)}
+                >
+                  <View style={styles.modalGroupInfo}>
+                    <Text style={styles.modalGroupEmoji}>{group.group_emoji}</Text>
+                    <Text style={[
+                      styles.modalGroupName,
+                      tempSelectedGroups.includes(group.group_id) && styles.selectedModalGroupText,
+                    ]}>
+                      {group.group_name}
+                    </Text>
+                  </View>
+                  <Text style={[
+                    styles.modalCheckboxText,
+                    tempSelectedGroups.includes(group.group_id) && styles.selectedModalCheckboxText,
+                  ]}>
+                    {tempSelectedGroups.includes(group.group_id) ? '✓' : '○'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity onPress={closeGroupModal} style={styles.cancelButton}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={confirmGroupSelection} style={styles.confirmButton}>
+                <Text style={styles.confirmButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -275,7 +449,6 @@ const styles = StyleSheet.create({
   },
   typeSelector: {
     flexDirection: 'row',
-    gap: 12,
     marginBottom: 24,
   },
   typeButton: {
@@ -286,7 +459,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     backgroundColor: '#F3F4F6',
-    gap: 8,
+    marginRight: 12,
   },
   selectedType: {
     backgroundColor: '#FF6B35',
@@ -295,6 +468,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FF6B35',
+    marginLeft: 8,
   },
   selectedTypeText: {
     color: '#fff',
@@ -314,7 +488,6 @@ const styles = StyleSheet.create({
   exerciseGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
     marginBottom: 24,
   },
   exerciseButton: {
@@ -324,7 +497,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     backgroundColor: '#F3F4F6',
-    gap: 8,
+    marginBottom: 12,
   },
   selectedExercise: {
     backgroundColor: '#FF6B35',
@@ -332,6 +505,7 @@ const styles = StyleSheet.create({
   exerciseText: {
     fontSize: 14,
     color: '#FF6B35',
+    marginLeft: 8,
   },
   selectedExerciseText: {
     color: '#fff',
@@ -339,7 +513,6 @@ const styles = StyleSheet.create({
   excuseGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
     marginBottom: 24,
   },
   excuseButton: {
@@ -349,7 +522,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     backgroundColor: '#F3F4F6',
-    gap: 8,
+    marginBottom: 12,
   },
   selectedExcuse: {
     backgroundColor: '#FF6B35',
@@ -357,6 +530,7 @@ const styles = StyleSheet.create({
   excuseText: {
     fontSize: 14,
     color: '#FF6B35',
+    marginLeft: 8,
   },
   selectedExcuseText: {
     color: '#fff',
@@ -391,5 +565,164 @@ const styles = StyleSheet.create({
   },
   buttonIcon: {
     marginRight: 8,
+  },
+  groupSection: {
+    marginBottom: 24,
+  },
+  currentGroupCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  groupEmoji: {
+    fontSize: 24,
+  },
+  groupName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginLeft: 8,
+  },
+  addGroupsLink: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  addGroupsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  selectedGroupsChips: {
+    marginTop: 12,
+  },
+  chipsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  chipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  chip: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  chipEmoji: {
+    fontSize: 24,
+  },
+  chipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 28,
+    borderRadius: 12,
+    width: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  selectAllButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  selectAllText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  modalGroupList: {
+    marginBottom: 12,
+    paddingBottom: 16,
+  },
+  modalGroupItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  selectedModalGroup: {
+    backgroundColor: '#FF6B35',
+  },
+  modalGroupInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  modalGroupName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginLeft: 8,
+  },
+  modalGroupEmoji: {
+    fontSize: 24,
+  },
+  selectedModalGroupText: {
+    color: '#fff',
+  },
+  modalCheckboxText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  selectedModalCheckboxText: {
+    color: '#fff',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  cancelButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  confirmButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#FF6B35',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FF6B35',
   },
 }); 

@@ -217,12 +217,18 @@ A tela de detalhes do grupo é o coração da experiência social do FitVibes. E
 
 ### 3.4 Tela de Postagem de Atividade
 
-A tela de postagem é projetada para tornar o processo de registro de atividades rápido e intuitivo. O design utiliza uma abordagem de decisão binária clara seguida por opções específicas.
+A tela de postagem é projetada para tornar o processo de registro de atividades rápido e intuitivo. O design utiliza uma abordagem de decisão binária clara seguida por opções específicas, agora com suporte para postagem em múltiplos grupos.
 
 **Fluxo de Decisão:**
 - **Pergunta Principal:** "Você treinou hoje?" em tipografia grande e bold
 - **Botões Principais:** "SIM" (verde) e "NÃO" (vermelho) com 156x56px cada
 - **Opções Condicionais:** Aparecem baseadas na seleção inicial
+
+**Seleção de Grupos (Nova Funcionalidade):**
+- **Lista de Grupos:** Cards com nome, emoji e cor temática de cada grupo
+- **Checkboxes:** Permite seleção múltipla de grupos para postagem
+- **Indicador de Status:** Mostra se já postou em cada grupo hoje
+- **Botão "Selecionar Todos":** Para facilitar postagem em todos os grupos
 
 **Para Atividade Física (SIM):**
 - **Tipos de Exercício:** Lista com ícones coloridos (caminhada, corrida, natação, musculação, yoga)
@@ -233,6 +239,11 @@ A tela de postagem é projetada para tornar o processo de registro de atividades
 - **Lista de Opções:** Checkboxes com desculpas pré-definidas
 - **Categorias:** Médicas, pessoais, profissionais, outras
 - **Validação:** Seleção obrigatória de pelo menos uma opção
+
+**Confirmação Multi-Grupo:**
+- **Resumo:** "Postando em X grupos: [Lista de grupos]"
+- **Botão de Confirmação:** "Postar em Todos os Grupos Selecionados"
+- **Feedback:** Confirmação individual para cada grupo
 
 ### 3.5 Tela de Votação
 
@@ -248,6 +259,11 @@ A tela de votação transforma o processo de avaliação das atividades dos amig
 - **Reações Rápidas:** Tap simples para votar
 - **Comentários Predefinidos:** "Desculpa esfarrapada", "Boa, bora pra próxima!", "Te entendo, mas amanhã não foge!"
 - **Feedback Visual:** Animações de confirmação após votação
+
+**Votação Independente por Grupo:**
+- **Contexto Claro:** Indicação visual de qual grupo está sendo votado
+- **Status de Votação:** Mostra se já votou nesta atividade específica
+- **Navegação:** Filtros para ver atividades pendentes de votação
 
 ### 3.6 Tela de Rankings
 
@@ -269,6 +285,31 @@ A tela de rankings é o elemento mais gamificado do aplicativo, apresentando con
 - **Barras de Progresso:** Indicadores visuais de pontos
 - **Badges:** Conquistas especiais com ícones únicos
 - **Animações:** Efeitos de celebração para mudanças de posição
+
+### 3.7 Tela de Perfil do Usuário (Nova)
+
+A tela de perfil apresenta estatísticas pessoais e conquistas individuais, com foco especial no streak global e recordes pessoais.
+
+**Estatísticas Principais:**
+- **Streak Global Atual:** "X dias seguidos sem faltar" com ícone de chama
+- **Recorde Pessoal:** "Melhor sequência: Y dias" com troféu
+- **Total de Grupos:** Número de grupos ativos
+- **Pontuação Total:** Soma de pontos em todos os grupos
+
+**Conquistas Globais:**
+- **Grid de Badges:** Conquistas globais organizadas por categoria
+- **Progresso:** Indicadores visuais de progresso para próximas conquistas
+- **Histórico:** Timeline de conquistas com datas
+
+**Estatísticas Detalhadas:**
+- **Atividades por Tipo:** Gráfico de pizza mostrando distribuição de exercícios
+- **Consistência Semanal:** Calendário estilo GitHub com dias ativos
+- **Ranking nos Grupos:** Posição atual em cada grupo participante
+
+**Configurações Pessoais:**
+- **Editar Perfil:** Nome, foto, configurações de notificação
+- **Preferências:** Configurações de privacidade e visibilidade
+- **Sobre:** Informações sobre o usuário e data de entrada
 
 
 ## 4. Sistema de Componentes e Design System
@@ -463,8 +504,21 @@ O FitVibes incorpora elementos de gamificação cuidadosamente projetados para m
 - **Desculpa Aceita:** -3 pontos (penalidade leve)
 - **Desculpa Rejeitada:** -8 pontos (penalidade maior)
 
+**Sistema de Streaks Duplo:**
+- **Streak Global:** Conta dias consecutivos onde o usuário postou em pelo menos um grupo
+  - Armazenado em `users.global_streak_days`
+  - Recorde pessoal em `users.global_streak_record`
+  - Só incrementa uma vez por dia, independente do número de grupos
+  - Exibido no perfil como "X dias seguidos sem faltar"
+
+- **Streak por Grupo:** Conta dias consecutivos de atividades válidas em um grupo específico
+  - Armazenado em `group_members.streak_days`
+  - Cada grupo tem seu próprio contador independente
+  - Exibido na tela do grupo como "X dias seguidos neste grupo"
+
 **Conquistas e Badges:**
-- **Sequências:** 7, 14, 30, 60, 100 dias consecutivos
+- **Conquistas de Streak Global:** 1, 7, 14, 30, 60, 100 dias consecutivos
+- **Conquistas de Streak por Grupo:** 1, 7, 14, 30, 60, 100 dias consecutivos em cada grupo
 - **Variedade:** Experimentar 5 tipos diferentes de exercício
 - **Social:** Votar em 50, 100, 200 atividades de amigos
 - **Liderança:** Ficar em 1º lugar no grupo por uma semana
@@ -474,7 +528,7 @@ O FitVibes incorpora elementos de gamificação cuidadosamente projetados para m
 - **Mais Esforçado:** Baseado em pontos totais e consistência
 - **Rei/Rainha do Migué:** Maior número de desculpas rejeitadas (tom humorístico)
 - **Melhor Desculpa:** Desculpas mais criativas votadas pelo grupo
-- **Streak Master:** Maior sequência atual de dias ativos
+- **Streak Master:** Maior sequência atual de dias ativos (global ou por grupo)
 
 ### 6.2 Elementos Visuais de Motivação
 
@@ -490,6 +544,12 @@ O FitVibes incorpora elementos de gamificação cuidadosamente projetados para m
 - **Monthly Achievements:** Calendário visual com dias completados
 - **Yearly Overview:** Gráfico de atividade estilo GitHub
 
+**Diferenciação Visual de Streaks:**
+- **Streak Global:** Ícone de chama global com cor dourada
+- **Streak por Grupo:** Ícone de chama com cor temática do grupo
+- **Recorde Pessoal:** Troféu dourado para indicar melhor sequência
+- **Progresso Atual:** Barra de progresso animada para próximas conquistas
+
 ### 6.3 Pressão Social Positiva
 
 **Mecânicas de Grupo:**
@@ -503,6 +563,12 @@ O FitVibes incorpora elementos de gamificação cuidadosamente projetados para m
 - **Encorajamento:** "Você está a 2 dias de bater seu recorde!"
 - **Celebração:** "Parabéns! Você completou 7 dias seguidos!"
 - **Social:** "Clara votou na sua atividade de ontem"
+
+**Multi-Grupo Engagement:**
+- **Facilitação:** Postagem simultânea em múltiplos grupos
+- **Contexto Independente:** Cada grupo vota independentemente
+- **Streak Flexível:** Streak global não é afetado por falhas em grupos específicos
+- **Motivação Composta:** Conquistas em um grupo podem motivar outros grupos
 
 ## 7. Considerações de UX e Usabilidade
 

@@ -190,7 +190,8 @@ CREATE TABLE users (
     last_login TIMESTAMP WITH TIME ZONE,
     notification_token TEXT,
     points INTEGER DEFAULT 0,
-    streak_days INTEGER DEFAULT 0
+    global_streak_days INTEGER DEFAULT 0,
+    global_streak_record INTEGER DEFAULT 0
 );
 ```
 
@@ -336,6 +337,30 @@ CREATE INDEX idx_balances_user_id ON balances(user_id);
 ```
 
 ---
+
+## 🏆 Achievements System
+
+### Streak Types
+1. **Global Streak**: Tracks consecutive days where user posted in at least one group
+   - Stored in `users.global_streak_days`
+   - Record stored in `users.global_streak_record`
+   - Only increments once per day, regardless of how many groups user posted in
+
+2. **Group Streak**: Tracks consecutive days of valid activities in a specific group
+   - Stored in `group_members.streak_days`
+   - Each group has its own streak counter
+
+### Achievement Triggers
+- **Global Streak Achievements**: Triggered when `global_streak_days` reaches thresholds (1, 7, 14, 30, 60, 100)
+- **Group Streak Achievements**: Triggered when `group_members.streak_days` reaches thresholds (1, 7, 14, 30, 60, 100)
+- **Variety Achievements**: Triggered when user tries different exercise types
+- **Social Achievements**: Triggered by voting participation, group leadership, etc.
+
+### Multi-Group Posting
+- Users can select multiple groups when posting an activity
+- Backend creates separate activity records for each selected group
+- Each group votes independently on their respective activity
+- Global streak only increments once per day if user posted in at least one group
 
 ## 📁 Folder Structure
 
