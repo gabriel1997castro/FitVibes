@@ -1,6 +1,5 @@
--- Migration: Support for posting activities to multiple groups
+-- Migration: Fix all ambiguous group_id references in create_activity_for_multiple_groups function
 
--- 1. Create function to post activity to multiple groups
 CREATE OR REPLACE FUNCTION public.create_activity_for_multiple_groups(
     p_user_id UUID,
     p_groups UUID[],
@@ -37,7 +36,7 @@ BEGIN
         IF EXISTS (
             SELECT 1 FROM activities 
             WHERE user_id = p_user_id 
-              AND group_id = group_id 
+              AND activities.group_id = group_id 
               AND date = p_date
         ) THEN
             RAISE EXCEPTION 'Activity already exists for user % in group % on date %', p_user_id, group_id, p_date;
@@ -72,44 +71,3 @@ BEGIN
     RETURN;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 2. Create function to get user's groups for activity posting
-CREATE OR REPLACE FUNCTION public.get_user_groups_for_posting(p_user_id UUID)
-RETURNS TABLE (
-    group_id UUID,
-    group_name VARCHAR(255),
-    group_emoji VARCHAR(10),
-    theme_color VARCHAR(7),
-    is_member BOOLEAN
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        g.id as group_id,
-        g.name::VARCHAR(255) as group_name,
-        g.emoji::VARCHAR(10) as group_emoji,
-        g.theme_color::VARCHAR(7) as theme_color,
-        true as is_member
-    FROM groups g
-    INNER JOIN group_members gm ON g.id = gm.group_id
-    WHERE gm.user_id = p_user_id
-    ORDER BY g.name;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 3. Create function to check if user has already posted in any group today
-CREATE OR REPLACE FUNCTION public.has_user_posted_today(p_user_id UUID, p_date DATE DEFAULT CURRENT_DATE)
-RETURNS BOOLEAN AS $$
-BEGIN
-    RETURN EXISTS (
-        SELECT 1 FROM activities 
-        WHERE user_id = p_user_id 
-          AND date = p_date
-    );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 4. Grant permissions for the new functions
-GRANT EXECUTE ON FUNCTION public.create_activity_for_multiple_groups TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_user_groups_for_posting TO authenticated;
-GRANT EXECUTE ON FUNCTION public.has_user_posted_today TO authenticated; 

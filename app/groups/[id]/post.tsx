@@ -18,21 +18,21 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { checkAndAwardStreakAchievements, checkAndAwardVarietyAchievements } from '../../features/achievements';
 
 const EXERCISE_TYPES = [
-  { id: 'walking', name: 'Caminhada', icon: 'walk' },
-  { id: 'running', name: 'Corrida', icon: 'run' },
-  { id: 'cycling', name: 'Ciclismo', icon: 'bike' },
-  { id: 'swimming', name: 'Natação', icon: 'swim' },
-  { id: 'gym', name: 'Academia', icon: 'weight-lifter' },
-  { id: 'yoga', name: 'Yoga', icon: 'yoga' },
-  { id: 'other', name: 'Outro', icon: 'dumbbell' },
+  { id: 'walking', name: 'Caminhada', icon: 'walk' as const },
+  { id: 'running', name: 'Corrida', icon: 'run' as const },
+  { id: 'cycling', name: 'Ciclismo', icon: 'bike' as const },
+  { id: 'swimming', name: 'Natação', icon: 'swim' as const },
+  { id: 'gym', name: 'Academia', icon: 'weight-lifter' as const },
+  { id: 'yoga', name: 'Yoga', icon: 'yoga' as const },
+  { id: 'other', name: 'Outro', icon: 'dumbbell' as const },
 ];
 
 const EXCUSE_CATEGORIES = [
-  { id: 'medical', name: 'Atestado médico', icon: 'medical-bag' },
-  { id: 'travel', name: 'Viagem', icon: 'airplane' },
-  { id: 'event', name: 'Evento importante', icon: 'calendar-star' },
-  { id: 'tired', name: 'Cansaço', icon: 'sleep' },
-  { id: 'other', name: 'Outro', icon: 'dots-horizontal' },
+  { id: 'medical', name: 'Atestado médico', icon: 'medical-bag' as const },
+  { id: 'travel', name: 'Viagem', icon: 'airplane' as const },
+  { id: 'event', name: 'Evento importante', icon: 'calendar-star' as const },
+  { id: 'tired', name: 'Cansaço', icon: 'sleep' as const },
+  { id: 'other', name: 'Outro', icon: 'dots-horizontal' as const },
 ];
 
 const AUTO_EXCUSE_TEXT = "Hoje não treinei porque fui muito migué! 😅";
@@ -107,6 +107,12 @@ export default function PostActivityScreen() {
     });
   };
 
+  const removeGroupFromSelection = (groupId: string) => {
+    if (selectedGroups.length > 1) {
+      setSelectedGroups(prev => prev.filter(id => id !== groupId));
+    }
+  };
+
   const selectAllGroups = () => {
     setTempSelectedGroups(userGroups.map(group => group.group_id));
   };
@@ -117,6 +123,38 @@ export default function PostActivityScreen() {
 
   const getSelectedGroupsInfo = () => {
     return userGroups.filter(group => selectedGroups.includes(group.group_id));
+  };
+
+  const renderGroupChips = () => {
+    const selectedGroupsInfo = getSelectedGroupsInfo();
+    console.log('Selected groups info:', selectedGroupsInfo); // Debug
+    const maxVisible = 3;
+    const visibleGroups = selectedGroupsInfo.slice(0, maxVisible);
+    const remainingCount = selectedGroupsInfo.length - maxVisible;
+
+    return (
+      <View style={styles.chipsContainer}>
+        {visibleGroups.map((group) => (
+          <View key={group.group_id} style={styles.chip}>
+            <Text style={styles.chipEmoji}>{group.group_emoji}</Text>
+            <Text style={styles.chipText} numberOfLines={1}>{group.group_name}</Text>
+            {selectedGroups.length > 1 && (
+              <TouchableOpacity
+                onPress={() => removeGroupFromSelection(group.group_id)}
+                style={styles.chipRemoveButton}
+              >
+                <Text style={styles.chipRemoveText}>×</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        ))}
+        {remainingCount > 0 && (
+          <View style={styles.chipMore}>
+            <Text style={styles.chipMoreText}>+{remainingCount}</Text>
+          </View>
+        )}
+      </View>
+    );
   };
 
   const handlePost = async () => {
@@ -192,7 +230,6 @@ export default function PostActivityScreen() {
   };
 
   const currentGroup = getCurrentGroup();
-  const selectedGroupsInfo = getSelectedGroupsInfo();
 
   return (
     <KeyboardAvoidingView
@@ -205,7 +242,9 @@ export default function PostActivityScreen() {
         <View style={styles.typeSelector}>
           <TouchableOpacity
             style={[styles.typeButton, type === 'exercise' && styles.selectedType]}
-            onPress={() => setType('exercise')}
+            onPress={() => {
+              setType('exercise');
+            }}
           >
             <MaterialCommunityIcons
               name="check-circle"
@@ -219,7 +258,9 @@ export default function PostActivityScreen() {
 
           <TouchableOpacity
             style={[styles.typeButton, type === 'excuse' && styles.selectedType]}
-            onPress={() => setType('excuse')}
+            onPress={() => {
+              setType('excuse');
+            }}
           >
             <MaterialCommunityIcons
               name="close-circle"
@@ -244,7 +285,9 @@ export default function PostActivityScreen() {
                     selectedExercise === exercise.id && styles.selectedExercise,
                     idx % 2 === 0 && { marginRight: 12 },
                   ]}
-                  onPress={() => setSelectedExercise(exercise.id)}
+                  onPress={() => {
+                    setSelectedExercise(exercise.id);
+                  }}
                 >
                   <MaterialCommunityIcons
                     name={exercise.icon}
@@ -286,7 +329,9 @@ export default function PostActivityScreen() {
                     selectedExcuse === excuse.id && styles.selectedExcuse,
                     idx % 2 === 0 && { marginRight: 12 },
                   ]}
-                  onPress={() => setSelectedExcuse(excuse.id)}
+                  onPress={() => {
+                    setSelectedExcuse(excuse.id);
+                  }}
                 >
                   <MaterialCommunityIcons
                     name={excuse.icon}
@@ -320,28 +365,29 @@ export default function PostActivityScreen() {
         {/* Clean group selection section */}
         {type && (
           <View style={styles.groupSection}>
-            {selectedGroups.length === 1 && currentGroup && (
-              <View style={styles.currentGroupCard}>
-                <Text style={styles.groupEmoji}>{currentGroup.group_emoji}</Text>
-                <Text style={styles.groupName}>{currentGroup.group_name}</Text>
-              </View>
+            {selectedGroups.length === 1 && (
+              (() => {
+                const selectedGroupInfo = getSelectedGroupsInfo()[0];
+                return selectedGroupInfo ? (
+                  <View style={styles.currentGroupCard}>
+                    <Text style={styles.groupEmoji}>{selectedGroupInfo.group_emoji}</Text>
+                    <Text style={styles.groupName}>{selectedGroupInfo.group_name}</Text>
+                  </View>
+                ) : null;
+              })()
             )}
 
-            <TouchableOpacity onPress={openGroupModal} style={styles.addGroupsLink}>
-              <Text style={styles.addGroupsText}>Adicionar outros grupos</Text>
-            </TouchableOpacity>
+            <View style={styles.groupActionsContainer}>
+              <TouchableOpacity onPress={openGroupModal} style={styles.addGroupsButton}>
+                <Text style={styles.addGroupsIcon}>+</Text>
+                <Text style={styles.addGroupsText}>Adicionar grupos</Text>
+              </TouchableOpacity>
+            </View>
 
             {selectedGroups.length > 1 && (
               <View style={styles.selectedGroupsChips}>
                 <Text style={styles.chipsTitle}>Postando para:</Text>
-                <View style={styles.chipsContainer}>
-                  {selectedGroupsInfo.map((group) => (
-                    <View key={group.group_id} style={styles.chip}>
-                      <Text style={styles.chipEmoji}>{group.group_emoji}</Text>
-                      <Text style={styles.chipText}>{group.group_name}</Text>
-                    </View>
-                  ))}
-                </View>
+                {renderGroupChips()}
               </View>
             )}
           </View>
@@ -385,7 +431,7 @@ export default function PostActivityScreen() {
             </View>
 
             <TouchableOpacity onPress={selectAllGroups} style={styles.selectAllButton}>
-              <Text style={styles.selectAllText}>Selecionar todos</Text>
+              <Text style={styles.selectAllText}>Selecionar todos os grupos</Text>
             </TouchableOpacity>
 
             <ScrollView style={styles.modalGroupList}>
@@ -407,12 +453,14 @@ export default function PostActivityScreen() {
                       {group.group_name}
                     </Text>
                   </View>
-                  <Text style={[
-                    styles.modalCheckboxText,
-                    tempSelectedGroups.includes(group.group_id) && styles.selectedModalCheckboxText,
+                  <View style={[
+                    styles.modalCheckbox,
+                    tempSelectedGroups.includes(group.group_id) && styles.modalCheckboxSelected,
                   ]}>
-                    {tempSelectedGroups.includes(group.group_id) ? '✓' : '○'}
-                  </Text>
+                    {tempSelectedGroups.includes(group.group_id) && (
+                      <Text style={styles.modalCheckboxText}>✓</Text>
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -585,15 +633,23 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     marginLeft: 8,
   },
-  addGroupsLink: {
+  addGroupsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 12,
     borderRadius: 8,
     backgroundColor: '#F3F4F6',
   },
+  addGroupsIcon: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3B82F6',
+    marginRight: 8,
+  },
   addGroupsText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#3B82F6',
   },
   selectedGroupsChips: {
     marginTop: 12,
@@ -609,19 +665,55 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 8,
+    paddingRight: 12,
     borderRadius: 8,
     backgroundColor: '#F3F4F6',
     marginRight: 8,
     marginBottom: 8,
+    position: 'relative',
+    minWidth: 120,
   },
   chipEmoji: {
-    fontSize: 24,
+    fontSize: 20,
+    marginRight: 8,
   },
   chipText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
+    flex: 1,
+    flexShrink: 1,
+  },
+  chipRemoveButton: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+  },
+  chipRemoveText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FF6B35',
+  },
+  chipMore: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#FF6B35',
+  },
+  chipMoreText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   modalOverlay: {
     flex: 1,
@@ -687,12 +779,21 @@ const styles = StyleSheet.create({
   selectedModalGroupText: {
     color: '#fff',
   },
+  modalCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#FF6B35',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCheckboxSelected: {
+    backgroundColor: '#FF6B35',
+  },
   modalCheckboxText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF6B35',
-  },
-  selectedModalCheckboxText: {
     color: '#fff',
   },
   modalButtons: {
@@ -724,5 +825,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FF6B35',
+  },
+  groupActionsContainer: {
+    marginBottom: 12,
   },
 }); 
