@@ -50,7 +50,7 @@ const PREDEFINED_COMMENTS = {
 
 export default function ActivityDetailsScreen() {
   const router = useRouter();
-  const { activityId } = useLocalSearchParams<{ activityId: string }>();
+  const { activityId, groupId } = useLocalSearchParams<{ activityId: string; groupId: string }>();
   const [loading, setLoading] = useState(true);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -81,7 +81,13 @@ export default function ActivityDetailsScreen() {
       if (activityError) throw activityError;
       setActivity(activityData);
 
-      // Fetch votes for this activity
+      // If activity is pending, redirect to voting
+      if (activityData.status === 'pending') {
+        router.replace(`/groups/${activityData.group_id}/vote?activityId=${activityId}`);
+        return;
+      }
+
+      // Fetch votes for this activity (even if pending)
       const { data: votesData, error: votesError } = await supabase
         .from('votes')
         .select(`

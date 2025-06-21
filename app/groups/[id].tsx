@@ -53,6 +53,28 @@ type Activity = {
   };
 };
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'valid':
+      return { backgroundColor: '#D1FAE5', color: '#059669' };
+    case 'invalid':
+      return { backgroundColor: '#FEE2E2', color: '#DC2626' };
+    default: // pending
+      return { backgroundColor: '#FEF3C7', color: '#D97706' };
+  }
+};
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case 'valid':
+      return 'Válido';
+    case 'invalid':
+      return 'Inválido';
+    default: // pending
+      return 'Pendente';
+  }
+};
+
 export default function GroupDetailsScreen() {
   const router = useRouter();
   const { id, refresh } = useLocalSearchParams();
@@ -199,13 +221,13 @@ export default function GroupDetailsScreen() {
                     <Text style={styles.activityUser}>{activity.user.name}</Text>
                     <View style={[
                       styles.statusBadge,
-                      { backgroundColor: activity.status === 'valid' ? '#D1FAE5' : '#FEE2E2' }
+                      getStatusColor(activity.status)
                     ]}>
                       <Text style={[
                         styles.statusText,
-                        { color: activity.status === 'valid' ? '#059669' : '#DC2626' }
+                        { color: getStatusColor(activity.status).color }
                       ]}>
-                        {activity.status === 'valid' ? 'Válido' : 'Inválido'}
+                        {getStatusText(activity.status)}
                       </Text>
                     </View>
                   </View>

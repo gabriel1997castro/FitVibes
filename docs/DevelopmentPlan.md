@@ -164,11 +164,38 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Created confirmation button that only enables after vote selection
    - [X] Comments are now truly optional and independent of vote choice
    - [X] Improved UX flow: Select vote → (optional) Select comment → Confirm
+   - [X] **ENHANCED: Smart activity navigation flow**
+   - [X] Activities with 'pending' status redirect to voting screen when clicked
+   - [X] After voting, automatically redirect to activity details to see results
+   - [X] Added "Ver Detalhes da Atividade" button in voting screen
+   - [X] Improved user flow: Click pending activity → Vote → See results → Continue
 
-5. **Data Consistency** ✅
+5. **Status Display Fixes** ✅
+   - [X] **FIXED: Status 'pending' not displaying correctly in activities list**
+   - [X] Added proper handling for all three status types: valid, invalid, pending
+   - [X] Implemented consistent color coding: green (valid), red (invalid), yellow (pending)
+   - [X] Created reusable status utility functions for consistency
+   - [X] Applied same status logic to both group list and activity details screens
+
+6. **Data Consistency** ✅
    - [X] Verify all exercise types are stored consistently in database
    - [X] Ensure excuse categories are properly translated
    - [X] Test translation functions with various input scenarios
+
+7. **Navigation Flow Fixes** ✅
+   - [X] **FIXED: Loop infinito de redirecionamento entre votação e detalhes**
+   - [X] **IMPLEMENTED: Novo fluxo de navegação conforme solicitado**
+   - [X] Clicar em atividade pendente → Votação daquela atividade específica
+   - [X] Após votar → Redirecionar para detalhes daquela atividade
+   - [X] Clicar no ícone de informações → Direto para detalhes da atividade
+   - [X] Suporte para votação de atividade específica via parâmetro activityId
+   - [X] Mantido fluxo original para votação em múltiplas atividades
+   - [X] **REMOVED: Botão de informações da tela de votação**
+   - [X] Usuário agora é obrigado a votar para ver detalhes da atividade
+   - [X] **IMPROVED: UI dos botões de votação**
+   - [X] Botões com fundo claro e bordas coloridas
+   - [X] Ícones verdes para "Válido" e vermelhos para "Migué"
+   - [X] Estado selecionado com fundo laranja e texto branco
 
 ### Phase 9: Testing and Optimization 🔄 IN PROGRESS
 1. **Testing**

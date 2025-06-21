@@ -39,7 +39,7 @@ type Activity = {
 
 export default function VoteScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, activityId } = useLocalSearchParams<{ id: string; activityId?: string }>();
   const [loading, setLoading] = useState(true);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -51,31 +51,52 @@ export default function VoteScreen() {
 
   useEffect(() => {
     fetchActivities();
-  }, [id]);
+  }, [id, activityId]);
 
   const fetchActivities = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Get today's activities that need voting
-      const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
-        .from('activities')
-        .select(`
-          *,
-          user:users (
-            name,
-            avatar_url
-          )
-        `)
-        .eq('group_id', id)
-        .eq('date', today)
-        .eq('status', 'pending')
-        .neq('user_id', user.id); // Don't show user's own activities
+      if (activityId) {
+        // Fetch specific activity for voting
+        const { data, error } = await supabase
+          .from('activities')
+          .select(`
+            *,
+            user:users (
+              name,
+              avatar_url
+            )
+          `)
+          .eq('id', activityId)
+          .eq('group_id', id)
+          .eq('status', 'pending')
+          .neq('user_id', user.id) // Don't show user's own activities
+          .single();
 
-      if (error) throw error;
-      setActivities(data || []);
+        if (error) throw error;
+        setActivities(data ? [data] : []);
+      } else {
+        // Get today's activities that need voting (original behavior)
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await supabase
+          .from('activities')
+          .select(`
+            *,
+            user:users (
+              name,
+              avatar_url
+            )
+          `)
+          .eq('group_id', id)
+          .eq('date', today)
+          .eq('status', 'pending')
+          .neq('user_id', user.id); // Don't show user's own activities
+
+        if (error) throw error;
+        setActivities(data || []);
+      }
     } catch (error) {
       console.error('Error fetching activities:', error);
       Alert.alert('Erro', 'Não foi possível carregar as atividades.');
@@ -233,14 +254,30 @@ export default function VoteScreen() {
       setSelectedVote(null);
       setSelectedComment(null);
 
-      // Move to next activity
+      // If voting a specific activity, redirect to its details
+      if (activityId) {
+        router.push(`/groups/${id}/activity/${activityId}`);
+        return;
+      }
+
+      // Move to next activity or show completion message (for multiple activities)
       if (currentIndex < activities.length - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
+        // All activities voted, show completion
         Alert.alert(
-          'Sucesso',
-          'Você votou em todas as atividades!',
-          [{ text: 'OK', onPress: () => router.back() }]
+          'Votação Concluída!',
+          'Você votou em todas as atividades pendentes hoje.',
+          [
+            {
+              text: 'Ver Detalhes',
+              onPress: () => router.push(`/groups/${id}/activity/${activities[currentIndex].id}`)
+            },
+            {
+              text: 'Voltar aos Grupos',
+              onPress: () => router.back()
+            }
+          ]
         );
       }
     } catch (error) {
@@ -332,8 +369,15 @@ export default function VoteScreen() {
               onPress={() => handleVoteSelection('valid')}
               disabled={voting}
             >
-              <MaterialCommunityIcons name="check" size={24} color="#fff" />
-              <Text style={styles.voteButtonText}>Válido</Text>
+              <MaterialCommunityIcons 
+                name="check" 
+                size={24} 
+                color={selectedVote === 'valid' ? '#fff' : '#10B981'} 
+              />
+              <Text style={[
+                styles.voteButtonText,
+                selectedVote === 'valid' && { color: '#fff' }
+              ]}>Válido</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -345,8 +389,15 @@ export default function VoteScreen() {
               onPress={() => handleVoteSelection('invalid')}
               disabled={voting}
             >
-              <MaterialCommunityIcons name="close" size={24} color="#fff" />
-              <Text style={styles.voteButtonText}>Migué</Text>
+              <MaterialCommunityIcons 
+                name="close" 
+                size={24} 
+                color={selectedVote === 'invalid' ? '#fff' : '#EF4444'} 
+              />
+              <Text style={[
+                styles.voteButtonText,
+                selectedVote === 'invalid' && { color: '#fff' }
+              ]}>Migué</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -458,6 +509,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1F2937',
     marginLeft: 12,
+    flex: 1,
   },
   activityContent: {
     marginBottom: 24,
@@ -504,18 +556,24 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginHorizontal: 8,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   validButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#F0FDF4',
+    borderColor: '#10B981',
   },
   invalidButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FEF2F2',
+    borderColor: '#EF4444',
   },
   selectedVoteButton: {
     backgroundColor: '#FF6B35',
+    borderColor: '#FF6B35',
   },
   voteButtonText: {
-    color: '#fff',
+    color: '#1F2937',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
