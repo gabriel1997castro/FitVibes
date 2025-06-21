@@ -56,6 +56,9 @@ export default function GroupSettingsScreen() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Usuário não autenticado');
+      
+      console.log('Current user:', user.id);
+      console.log('Fetching members for group:', id);
 
       // Fetch group details
       const { data: groupData, error: groupError } = await supabase
@@ -85,6 +88,9 @@ export default function GroupSettingsScreen() {
         .eq('group_id', id);
 
       if (membersError) throw membersError;
+      console.log('Members loaded:', membersData);
+      console.log('Members count:', membersData?.length);
+      console.log('Admin members:', membersData?.filter(m => m.role === 'admin'));
       setMembers(membersData);
     } catch (error) {
       console.error('Error fetching group details:', error);

@@ -256,6 +256,9 @@ export default function VoteScreen() {
 
       // If voting a specific activity, redirect to its details
       if (activityId) {
+        // Replace current route with group route, then push activity details
+        // This makes the back button go to the group page
+        router.replace(`/groups/${id}`);
         router.push(`/groups/${id}/activity/${activityId}`);
         return;
       }

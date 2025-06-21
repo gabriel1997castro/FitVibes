@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../../services/supabase';
@@ -14,6 +15,7 @@ import { translateExerciseType, translateExcuseCategory } from '../../../lib/exe
 
 type Activity = {
   id: string;
+  group_id: string;
   user_id: string;
   type: 'exercise' | 'excuse' | 'auto_excuse';
   exercise_type?: string;
@@ -65,6 +67,9 @@ export default function ActivityDetailsScreen() {
     try {
       setLoading(true);
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
       // Fetch activity details
       const { data: activityData, error: activityError } = await supabase
         .from('activities')
@@ -81,8 +86,8 @@ export default function ActivityDetailsScreen() {
       if (activityError) throw activityError;
       setActivity(activityData);
 
-      // If activity is pending, redirect to voting
-      if (activityData.status === 'pending') {
+      // If activity is pending and NOT owned by current user, redirect to voting
+      if (activityData.status === 'pending' && activityData.user_id !== user.id) {
         router.replace(`/groups/${activityData.group_id}/vote?activityId=${activityId}`);
         return;
       }

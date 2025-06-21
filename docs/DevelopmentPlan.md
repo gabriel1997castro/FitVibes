@@ -18,7 +18,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Set up database migrations
    - [X] Configure connection pooling
 
-3. **Authentication System** 
+3. **Authentication System**
    - [X] Implement user registration
    - [X] Implement login with email/password
    - [ ] Add social login (Google, Apple)
@@ -26,7 +26,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Create protected routes
 
 ### Phase 2: Core Features - Groups 
-1. **Group Management** 
+1. **Group Management**
    - [X] Create group creation flow
    - [X] Implement group settings
    - [X] Add group member management
@@ -49,7 +49,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Implement auto-excuse feature
    - [X] **NEW: Multi-group posting support**
 
-2. **Activity UI** 
+2. **Activity UI**
    - [X] Design activity feed
    - [X] Create activity posting screen
    - [ ] Implement activity detail view
@@ -196,6 +196,23 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Botões com fundo claro e bordas coloridas
    - [X] Ícones verdes para "Válido" e vermelhos para "Migué"
    - [X] Estado selecionado com fundo laranja e texto branco
+   - [X] **IMPROVED: Navegação da tela de detalhes da atividade**
+   - [X] Configurado botão de voltar nativo do header
+   - [X] Botão voltar redireciona para a página do grupo
+   - [X] Header com título "Detalhes da Atividade" e "Grupo" como texto de voltar
+   - [X] **IMPROVED: Manipulação do histórico de navegação após votação**
+   - [X] Após votar, histórico é manipulado para voltar direto para o grupo
+   - [X] Usa router.replace para substituir rota de votação pela rota do grupo
+   - [X] Botão voltar nativo agora funciona corretamente após votação
+   - [X] **IMPROVED: Interface da tela do grupo**
+   - [X] Removida seção de membros da tela principal do grupo
+   - [X] Interface mais limpa e focada nas ações principais (postar, votar)
+   - [X] Membros agora são exibidos apenas na tela de configurações
+   - [X] Carregamento mais rápido e menos distrações visuais
+   - [X] **IMPROVED: Navegação para atividades próprias**
+   - [X] Usuário não é redirecionado para votação quando clica em sua própria atividade pendente
+   - [X] Pode ver detalhes de suas próprias atividades mesmo quando pendentes
+   - [X] Redirecionamento para votação apenas para atividades de outros usuários
 
 ### Phase 9: Testing and Optimization 🔄 IN PROGRESS
 1. **Testing**

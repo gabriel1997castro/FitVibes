@@ -25,17 +25,6 @@ type Group = {
   created_by: string;
 };
 
-type Member = {
-  id: string;
-  user_id: string;
-  group_id: string;
-  role: 'admin' | 'member';
-  users: {
-    name: string;
-    avatar_url: string | null;
-  };
-};
-
 type Activity = {
   id: string;
   group_id: string;
@@ -80,7 +69,6 @@ export default function GroupDetailsScreen() {
   const { id, refresh } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState<Group | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -105,24 +93,19 @@ export default function GroupDetailsScreen() {
       if (groupError) throw groupError;
       setGroup(groupData);
 
-      // Fetch members
-      const { data: membersData, error: membersError } = await supabase
+      // Check if user is admin (we still need this for settings access)
+      const { data: userMember, error: memberError } = await supabase
         .from('group_members')
-        .select(`
-          *,
-          users (
-            name,
-            avatar_url
-          )
-        `)
-        .eq('group_id', id);
+        .select('role')
+        .eq('group_id', id)
+        .eq('user_id', user.id)
+        .single();
 
-      if (membersError) throw membersError;
-      setMembers(membersData);
-
-      // Check if user is admin
-      const userMember = membersData.find(m => m.user_id === user.id);
-      setIsAdmin(userMember?.role === 'admin');
+      if (memberError) {
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(userMember?.role === 'admin');
+      }
 
       // Fetch activities
       const { data: activitiesData, error: activitiesError } = await supabase
@@ -187,18 +170,6 @@ export default function GroupDetailsScreen() {
         data={[{ key: 'content' }]}
         renderItem={() => (
           <>
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Membros</Text>
-              </View>
-              {members.map((member) => (
-                <View key={member.id} style={styles.memberItem}>
-                  <Text style={styles.memberName}>{member.users.name}</Text>
-                  <Text style={styles.memberRole}>{member.role === 'admin' ? 'Admin' : 'Membro'}</Text>
-                </View>
-              ))}
-            </View>
-
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Atividades</Text>
@@ -347,23 +318,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  memberItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  memberName: {
-    fontSize: 16,
-    color: '#1F2937',
-  },
-  memberRole: {
-    fontSize: 14,
-    color: '#6B7280',
   },
   activityItem: {
     padding: 12,
