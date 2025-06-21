@@ -189,15 +189,36 @@ export default function Profile() {
   const renderAchievementBadge = (achievement: Achievement) => {
     const isGlobalStreak = achievement.type === 'global_streak';
     const isGroupStreak = achievement.type === 'group_streak';
+    const isGlobal = achievement.type === 'global_streak' || !achievement.group_id;
+    const isGroup = achievement.group_id && achievement.type !== 'global_streak';
+    
+    const textColor = isGlobal ? '#fff' : '#333';
+    const descColor = isGlobal ? '#fff' : '#666';
     
     return (
-      <View key={achievement.id} style={styles.achievementBadge}>
-        <Text style={styles.achievementEmoji}>
-          {isGlobalStreak ? '🌍' : isGroupStreak ? '🔥' : '🏆'}
-        </Text>
-        <Text style={styles.achievementTitle}>{achievement.title}</Text>
-        <Text style={styles.achievementDesc}>{achievement.description}</Text>
-        <Text style={styles.achievementDate}>
+      <View key={achievement.id} style={[
+        styles.achievementBadge,
+        isGlobal && styles.globalAchievementBadge,
+        isGroup && styles.groupAchievementBadge
+      ]}>
+        <View style={styles.achievementHeader}>
+          <Text style={styles.achievementEmoji}>
+            {isGlobalStreak ? '🌍' : isGroupStreak ? '🔥' : isGlobal ? '🏆' : '⭐'}
+          </Text>
+          {isGlobal && (
+            <View style={styles.globalBadge}>
+              <Text style={styles.globalBadgeText}>GLOBAL</Text>
+            </View>
+          )}
+        </View>
+        <Text style={[styles.achievementTitle, { color: textColor }]}>{achievement.title}</Text>
+        <Text style={[styles.achievementDesc, { color: descColor }]}>{achievement.description}</Text>
+        {isGroup && (
+          <Text style={styles.groupName}>
+            {groupRankings.find(r => r.group_id === achievement.group_id)?.group_name || 'Grupo'}
+          </Text>
+        )}
+        <Text style={[styles.achievementDate, { color: descColor }]}>
           {new Date(achievement.earned_at).toLocaleDateString()}
         </Text>
       </View>
@@ -475,26 +496,58 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  achievementEmoji: {
-    fontSize: 32,
+  globalAchievementBadge: {
+    backgroundColor: '#FF6B35',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+  },
+  groupAchievementBadge: {
+    backgroundColor: '#f8f9fa',
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  achievementHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
   },
+  achievementEmoji: {
+    fontSize: 32,
+    marginRight: 8,
+  },
+  globalBadge: {
+    backgroundColor: '#FFD700',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  globalBadgeText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#FF6B35',
+    textAlign: 'center',
+  },
   achievementTitle: {
-    color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
     textAlign: 'center',
   },
   achievementDesc: {
-    color: '#fff',
     fontSize: 12,
     marginBottom: 6,
     textAlign: 'center',
     opacity: 0.9,
   },
+  groupName: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
   achievementDate: {
-    color: '#fff',
     fontSize: 10,
     opacity: 0.7,
     textAlign: 'center',
