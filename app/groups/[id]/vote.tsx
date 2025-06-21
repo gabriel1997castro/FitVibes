@@ -95,12 +95,14 @@ export default function VoteScreen() {
       }
 
       // Insert vote
+      console.log('Inserting vote with comment_type:', commentId);
       const { error: voteError } = await supabase
         .from('votes')
         .insert({
           activity_id: activities[currentIndex].id,
           voter_id: user.id,
-          is_valid: isValid
+          is_valid: isValid,
+          comment_type: commentId || null
         });
 
       if (voteError) {

@@ -148,7 +148,16 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Test formatting with various numbers of exercise types
    - [X] **OPTIMIZED: Removed unnecessary update functions - new achievements already have correct descriptions**
 
-3. **Data Consistency** ✅
+3. **Activity Details and Voting Results** ✅
+   - [X] **NEW: Created activity details screen** (`/groups/[id]/activity/[activityId]`)
+   - [X] Display complete activity information (type, duration, excuse details)
+   - [X] Show voting results summary (valid/invalid counts)
+   - [X] List individual votes with voter names and timestamps
+   - [X] Display comments made during voting
+   - [X] Add navigation from group activities list to details
+   - [X] Implement proper loading and error states
+
+4. **Data Consistency** ✅
    - [X] Verify all exercise types are stored consistently in database
    - [X] Ensure excuse categories are properly translated
    - [X] Test translation functions with various input scenarios

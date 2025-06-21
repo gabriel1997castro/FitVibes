@@ -190,7 +190,11 @@ export default function GroupDetailsScreen() {
                 </View>
               </View>
               {activities.map((activity) => (
-                <View key={activity.id} style={styles.activityItem}>
+                <TouchableOpacity
+                  key={activity.id}
+                  style={styles.activityItem}
+                  onPress={() => router.push(`/groups/${id}/activity/${activity.id}`)}
+                >
                   <View style={styles.activityHeader}>
                     <Text style={styles.activityUser}>{activity.user.name}</Text>
                     <View style={[
@@ -221,7 +225,11 @@ export default function GroupDetailsScreen() {
                   <Text style={styles.activityDate}>
                     {new Date(activity.date).toLocaleDateString()}
                   </Text>
-                </View>
+                  <View style={styles.activityFooter}>
+                    <Text style={styles.tapToView}>Toque para ver detalhes</Text>
+                    <MaterialCommunityIcons name="chevron-right" size={16} color="#6B7280" />
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
           </>
@@ -416,5 +424,15 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '600',
     lineHeight: 32,
+  },
+  activityFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  tapToView: {
+    fontSize: 14,
+    color: '#6B7280',
   },
 }); 
