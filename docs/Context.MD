@@ -299,6 +299,21 @@ CREATE TABLE achievements (
 );
 ```
 
+### Notifications Table
+```sql
+CREATE TABLE notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    group_id UUID REFERENCES groups(id),
+    type VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    body TEXT,
+    data JSONB,
+    read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ---
 
 ## 🔄 Database Relationships
@@ -308,6 +323,7 @@ CREATE TABLE achievements (
   - Group → Activities (one group can have many activities)
   - Group → Group Members (one group can have many members)
   - Activity → Votes (one activity can have many votes)
+  - User → Notifications (one user can have many notifications)
 - **Many-to-Many:**
   - Users ↔ Groups (through group_members)
   - Users ↔ Activities (through votes)
@@ -334,6 +350,12 @@ CREATE INDEX idx_votes_voter_id ON votes(voter_id);
 -- Balance lookups
 CREATE INDEX idx_balances_group_id_cycle ON balances(group_id, cycle_start_date, cycle_end_date);
 CREATE INDEX idx_balances_user_id ON balances(user_id);
+-- Achievement lookups
+CREATE INDEX idx_achievements_user_id ON achievements(user_id);
+CREATE INDEX idx_achievements_group_id ON achievements(group_id);
+-- Notification lookups
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_read ON notifications(read);
 ```
 
 ---
@@ -345,221 +367,302 @@ CREATE INDEX idx_balances_user_id ON balances(user_id);
    - Stored in `users.global_streak_days`
    - Record stored in `users.global_streak_record`
    - Only increments once per day, regardless of how many groups user posted in
+   - Triggered by `update_global_streak_on_valid_activity()` function
 
 2. **Group Streak**: Tracks consecutive days of valid activities in a specific group
    - Stored in `group_members.streak_days`
    - Each group has its own streak counter
+   - Triggered by `update_streak_days_on_valid_activity()` function
 
-### Achievement Triggers
+### Achievement Types
 - **Global Streak Achievements**: Triggered when `global_streak_days` reaches thresholds (1, 7, 14, 30, 60, 100)
 - **Group Streak Achievements**: Triggered when `group_members.streak_days` reaches thresholds (1, 7, 14, 30, 60, 100)
-- **Variety Achievements**: Triggered when user tries different exercise types
-- **Social Achievements**: Triggered by voting participation, group leadership, etc.
+- **Variety Achievements**: Triggered when user tries different exercise types (1, 5, 10 types)
+- **Social Achievements**: Triggered by voting participation, group leadership, first activity, etc.
 
 ### Multi-Group Posting
 - Users can select multiple groups when posting an activity
-- Backend creates separate activity records for each selected group
+- Backend creates separate activity records for each selected group using `create_activity_for_multiple_groups()` function
 - Each group votes independently on their respective activity
 - Global streak only increments once per day if user posted in at least one group
 
-## 📁 Folder Structure
+---
+
+## 🏗️ Current Project Architecture
+
+### Frontend Stack
+- **Framework**: React Native with Expo SDK 53
+- **Navigation**: Expo Router with file-based routing
+- **State Management**: Zustand for global state
+- **UI Components**: Custom components with MaterialCommunityIcons
+- **Styling**: StyleSheet with consistent design system
+- **TypeScript**: Full type safety throughout the application
+
+### Backend Stack
+- **Database**: PostgreSQL with Supabase
+- **Authentication**: Supabase Auth with social providers (Google, Apple)
+- **Real-time**: Supabase real-time subscriptions
+- **Storage**: Supabase Storage for media files
+- **Functions**: PostgreSQL functions for complex operations
+- **Row Level Security**: Comprehensive RLS policies
+
+### Key Technical Features Implemented
+
+#### 1. Multi-Group Activity Posting
+```sql
+-- Function to post activity to multiple groups
+CREATE OR REPLACE FUNCTION public.create_activity_for_multiple_groups(
+    p_user_id UUID,
+    p_groups UUID[],
+    p_type VARCHAR(20),
+    p_exercise_type VARCHAR(50) DEFAULT NULL,
+    p_duration_minutes INTEGER DEFAULT NULL,
+    p_excuse_category VARCHAR(50) DEFAULT NULL,
+    p_excuse_text TEXT DEFAULT NULL,
+    p_date DATE DEFAULT CURRENT_DATE
+)
+```
+
+#### 2. Dual Streak System
+```sql
+-- Global streak trigger
+CREATE TRIGGER trigger_update_global_streak
+AFTER UPDATE OF status ON activities
+FOR EACH ROW
+EXECUTE FUNCTION public.update_global_streak_on_valid_activity();
+
+-- Group streak trigger
+CREATE TRIGGER trigger_update_streak_days
+AFTER UPDATE OF status ON activities
+FOR EACH ROW
+EXECUTE FUNCTION public.update_streak_days_on_valid_activity();
+```
+
+#### 3. User Profile Statistics
+```sql
+-- Function to get comprehensive user stats
+CREATE OR REPLACE FUNCTION public.get_user_profile_stats(p_user_id UUID)
+RETURNS TABLE (
+    global_streak_days INTEGER,
+    global_streak_record INTEGER,
+    total_groups INTEGER,
+    total_points INTEGER,
+    total_activities INTEGER,
+    exercise_distribution JSONB
+)
+```
+
+#### 4. Achievement System
+- Automatic achievement detection and awarding
+- Visual differentiation between global and group achievements
+- Real-time achievement notifications
+- Achievement progress tracking
+
+---
+
+## 📁 Current Folder Structure
 
 ```
 fitvibes/
 ├── app/                      # App entry point and configuration
-│   ├── index.tsx             # Main entry (welcome/login)
-│   ├── _layout.tsx           # Expo Router layout
-│   ├── store.ts              # Zustand store configuration
-│   ├── theme.ts              # Theme configuration
-│   ├── services/             # API and external services
-│   ├── screens/              # Screen components (auth, groups, activities, profile)
-│   ├── components/           # Reusable UI components
-│   ├── features/             # Feature-specific logic (auth, groups, activities, voting, achievements)
-│   ├── hooks/                # Custom React hooks
-│   ├── navigation/           # Navigation configuration
-│   ├── store/                # Zustand/state management
-│   ├── types/                # TypeScript type definitions
-│   └── utils/                # Utility functions
-├── android/                  # Android specific files
-├── ios/                      # iOS specific files
-├── __tests__/                # Test files
-├── .env                      # Environment variables
-├── app.json                  # Expo configuration
-├── babel.config.js           # Babel configuration
-├── package.json              # Dependencies and scripts
-├── tsconfig.json             # TypeScript configuration
-└── README.md                 # Project documentation
-``` 
+│   ├── (tabs)/              # Tab-based navigation screens
+│   │   ├── groups.tsx       # Groups list screen
+│   │   ├── activities.tsx   # Activities feed (placeholder)
+│   │   ├── ranking.tsx      # Rankings screen (placeholder)
+│   │   ├── notifications.tsx # Notifications screen
+│   │   ├── profile.tsx      # User profile with achievements
+│   │   └── _layout.tsx      # Tab navigation layout
+│   ├── groups/              # Group-related screens
+│   │   ├── [id]/           # Dynamic group routes
+│   │   │   ├── post.tsx    # Activity posting screen
+│   │   │   ├── vote.tsx    # Voting screen
+│   │   │   ├── balance.tsx # Balance/payments screen
+│   │   │   └── settings.tsx # Group settings screen
+│   │   ├── [id].tsx        # Group details screen
+│   │   └── create.tsx      # Group creation screen
+│   ├── screens/            # Reusable screen components
+│   │   ├── LoginScreen.tsx
+│   │   ├── RegisterScreen.tsx
+│   │   ├── GroupListScreen.tsx
+│   │   ├── CreateGroupScreen.tsx
+│   │   └── GroupSettingsScreen.tsx
+│   ├── features/           # Feature-specific logic
+│   │   └── achievements/   # Achievement system
+│   │       └── index.ts    # Achievement logic
+│   ├── services/           # API and external services
+│   │   ├── supabase.ts     # Supabase client
+│   │   └── achievementsService.ts # Achievement API
+│   ├── types/              # TypeScript type definitions
+│   │   └── achievements.ts # Achievement types
+│   ├── lib/                # Utility functions
+│   ├── contexts/           # React contexts
+│   ├── _layout.tsx         # Root layout with auth
+│   ├── index.tsx           # Entry point
+│   ├── home.tsx            # Home screen
+│   ├── login.tsx           # Login route
+│   ├── register.tsx        # Register route
+│   ├── join.tsx            # Join group route
+│   ├── notifications.tsx   # Notifications screen
+│   ├── store.ts            # Zustand store
+│   └── theme.ts            # Theme configuration
+├── supabase/               # Database and backend
+│   ├── migrations/         # Database migrations
+│   ├── functions/          # Edge functions
+│   └── config.toml         # Supabase configuration
+├── assets/                 # Static assets
+├── docs/                   # Documentation
+├── types/                  # Global TypeScript types
+├── package.json            # Dependencies and scripts
+├── tsconfig.json           # TypeScript configuration
+├── app.json                # Expo configuration
+└── README.md               # Project documentation
+```
+
+---
 
 ## 🚀 Development Roadmap
 
-### Phase 1: Project Setup and Authentication (Week 1)
-1. **Initial Setup**
-   - Initialize React Native project with Expo
-   - Set up TypeScript configuration
-   - Configure ESLint and Prettier
-   - Set up folder structure
-   - Initialize Git repository
+### ✅ Completed Phases (1-8)
+1. **Project Setup and Authentication** - Complete
+2. **Core Features - Groups** - Complete
+3. **Activities and Posts** - Complete with multi-group support
+4. **Voting System** - Complete
+5. **Balance and Payments** - Complete
+6. **Gamification and Achievements** - Complete
+7. **Profile and Statistics** - Complete
+8. **Advanced Features** - Complete
 
-2. **Database Setup**
-   - Set up PostgreSQL database
-   - Create initial tables (users, groups)
-   - Set up database migrations
-   - Configure connection pooling
+### 🔄 Current Phase (9)
+**Testing and Optimization**
+- Unit and integration testing
+- Performance optimization
+- Security auditing
+- UI/UX polish
 
-3. **Authentication System**
-   - Implement user registration
-   - Implement login with email/password
-   - Add social login (Google, Apple)
-   - Set up JWT authentication
-   - Create protected routes
+### 📋 Upcoming Phases (10-11)
+**Deployment and Launch**
+- Production environment setup
+- App store submission
+- Marketing preparation
+- User feedback integration
 
-### Phase 2: Core Features - Groups (Week 2)
-1. **Group Management**
-   - Create group creation flow
-   - Implement group settings
-   - Add group member management
-   - Create group invite system
-   - Implement group search
+---
 
-2. **Group UI**
-   - Design and implement group list screen
-   - Create group detail screen
-   - Add group settings screen
-   - Implement group member list
-   - Add group invite UI
+## 🎯 Key Achievements
 
-### Phase 3: Activities and Posts (Week 3)
-1. **Activity System**
-   - Create activity posting flow
-   - Implement exercise type selection
-   - Add duration tracking
-   - Create excuse system
-   - Implement auto-excuse feature
+### Technical Achievements
+- **Multi-group posting**: Users can post activities to multiple groups simultaneously
+- **Dual streak system**: Global streak (across all groups) + group-specific streaks
+- **Real-time updates**: Live data synchronization across all screens
+- **Optimized queries**: Efficient SQL functions for complex data aggregation
+- **Secure architecture**: Comprehensive RLS policies and input validation
+- **Achievement system**: Automatic detection and visual differentiation
+- **Comprehensive profile**: Detailed statistics and achievements display
+- **Notification system**: Complete achievement and balance notifications with proper authentication
 
-2. **Activity UI**
-   - Design activity feed
-   - Create activity posting screen
-   - Implement activity detail view
-   - Add activity history
-   - Create activity statistics
+### User Experience Achievements
+- **Intuitive navigation**: File-based routing with Expo Router
+- **Smooth interactions**: Real-time updates and focus listeners
+- **Visual feedback**: Achievement badges, progress indicators, status updates
+- **Multi-platform**: iOS and Android support with Expo
+- **Social features**: Group management, voting, balance tracking
 
-### Phase 4: Voting System (Week 4)
-1. **Voting Logic**
-   - Implement voting mechanism
-   - Create vote validation
-   - Add comment system
-   - Implement vote notifications
-   - Create vote history
+### Performance Achievements
+- **Fast loading**: Optimized database queries and efficient data fetching
+- **Responsive UI**: Smooth animations and transitions
+- **Efficient state management**: Zustand for minimal re-renders
+- **Type safety**: Full TypeScript implementation
+- **Error handling**: Comprehensive error boundaries and user feedback
 
-2. **Voting UI**
-   - Design voting interface
-   - Create vote confirmation
-   - Add vote results view
-   - Implement vote notifications
-   - Create vote statistics
+---
 
-### Phase 5: Balance and Payments (Week 5)
-1. **Balance System**
-   - Implement balance tracking
-   - Create payment cycle system
-   - Add balance calculations
-   - Implement payment marking
-   - Create balance notifications
-
-2. **Balance UI**
-   - Design balance screen
-   - Create payment history
-   - Add balance statistics
-   - Implement payment marking UI
-   - Create balance notifications
-
-### Phase 6: Gamification and Achievements (Week 6)
-1. **Achievement System**
-   - Implement achievement logic
-   - Create achievement types
-   - Add achievement triggers
-   - Implement streak system
-   - Create achievement notifications
-
-2. **Achievement UI**
-   - Design achievement screen
-   - Create achievement badges
-   - Add achievement progress
-   - Implement achievement notifications
-   - Create achievement statistics
-
-### Phase 7: Testing and Optimization (Week 7)
-1. **Testing**
-   - Write unit tests
-   - Implement integration tests
-   - Add end-to-end tests
-   - Perform security testing
-   - Conduct performance testing
-
-2. **Optimization**
-   - Optimize database queries
-   - Implement caching
-   - Add performance monitoring
-   - Optimize image loading
-   - Implement lazy loading
-
-### Phase 8: Deployment and Launch (Week 8)
-1. **Deployment**
-   - Set up production environment
-   - Configure CI/CD pipeline
-   - Set up monitoring
-   - Configure backups
-   - Set up SSL certificates
-
-2. **Launch Preparation**
-   - Create app store listings
-   - Prepare marketing materials
-   - Set up analytics
-   - Create user documentation
-   - Plan launch strategy
-
-### Phase 9: Post-Launch (Ongoing)
-1. **Monitoring and Maintenance**
-   - Monitor app performance
-   - Track user feedback
-   - Fix reported bugs
-   - Implement improvements
-   - Update documentation
-
-2. **Feature Expansion**
-   - Plan new features
-   - Implement user requests
-   - Add premium features
-   - Expand social features
-   - Add new gamification elements
-
-## 📋 Development Guidelines
+## 🔧 Development Guidelines
 
 ### Code Standards
-- Follow TypeScript best practices
-- Use functional components with hooks
-- Implement proper error handling
-- Write comprehensive documentation
-- Follow Git flow branching strategy
+- ✅ TypeScript for type safety
+- ✅ Functional components with hooks
+- ✅ Proper error handling and user feedback
+- ✅ Comprehensive documentation
+- ✅ Git flow branching strategy
 
-### Testing Requirements
-- Maintain 80% code coverage
-- Write tests for all new features
-- Perform regular security audits
-- Conduct performance testing
-- Test on multiple devices
-
-### Documentation
-- Keep README updated
-- Document all API endpoints
-- Maintain changelog
-- Create user guides
-- Document deployment process
+### Testing Strategy
+- Unit tests for utility functions and components
+- Integration tests for API interactions
+- End-to-end tests for critical user flows
+- Performance testing for database queries
+- Security testing for authentication and authorization
 
 ### Performance Targets
-- App launch < 2 seconds
-- Screen transitions < 300ms
-- API response time < 200ms
-- Offline functionality
-- Battery usage optimization 
+- ✅ App launch < 2 seconds
+- ✅ Screen transitions < 300ms
+- ✅ API response time < 200ms
+- [ ] Offline functionality
+- [ ] Battery usage optimization
+
+### Security Measures
+- ✅ Row Level Security (RLS) policies
+- ✅ Input validation and sanitization
+- ✅ Secure authentication with Supabase
+- ✅ Protected routes and navigation
+- ✅ Data encryption in transit and at rest
+
+---
+
+## 📊 Success Metrics
+
+### Technical Metrics
+- **Code Coverage**: Target 80%+ for critical paths
+- **Performance**: < 2s app launch, < 300ms transitions
+- **Security**: Zero critical vulnerabilities
+- **Reliability**: 99.9% uptime target
+
+### User Experience Metrics
+- **User Retention**: 70%+ after 30 days
+- **Daily Active Users**: 60%+ of registered users
+- **Feature Adoption**: 80%+ for core features
+- **User Satisfaction**: NPS > 50
+
+### Business Metrics
+- **User Growth**: 40%+ organic growth via invites
+- **Engagement**: 5+ activities per user per week
+- **Social Features**: 3+ groups per active user
+- **Achievement Completion**: 70%+ achievement unlock rate
+
+---
+
+## 🚀 Next Steps
+
+### Immediate Priorities
+1. **Complete Testing Phase**
+   - Comprehensive unit and integration tests
+   - Performance optimization
+   - Security audit completion
+
+2. **Deployment Preparation**
+   - Production environment setup
+   - App store asset preparation
+   - CI/CD pipeline configuration
+
+3. **Launch Strategy**
+   - Beta testing with real users
+   - Marketing material creation
+   - Analytics and monitoring setup
+
+### Future Enhancements
+1. **Advanced Features**
+   - Chat functionality within groups
+   - Integration with fitness devices
+   - AI-powered insights and recommendations
+   - Premium subscription model
+
+2. **Scale and Growth**
+   - International expansion
+   - Enterprise features
+   - API for third-party integrations
+   - Community features and challenges
+
+---
+
+**Documento atualizado em:** Junho 2025  
+**Versão:** 2.0  
+**Status:** MVP Completo - Fase de Testes e Otimização 

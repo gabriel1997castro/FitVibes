@@ -63,7 +63,8 @@ export default function Profile() {
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      console.log('User:', user, 'Error:', userError);
       if (!user) {
         router.replace('/login');
         return;
