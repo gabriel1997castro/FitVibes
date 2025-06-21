@@ -14,6 +14,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { getUserAchievements } from '../services/achievementsService';
 import { Achievement } from '../types/achievements';
+import { translateExerciseType } from '../lib/exerciseTranslations';
 
 interface UserStats {
   global_streak_days: number;
@@ -235,7 +236,7 @@ export default function Profile() {
         <View style={styles.exerciseGrid}>
           {userStats.exercise_distribution.map((exercise, index) => (
             <View key={index} style={styles.exerciseItem}>
-              <Text style={styles.exerciseType}>{exercise.type}</Text>
+              <Text style={styles.exerciseType}>{translateExerciseType(exercise.type)}</Text>
               <Text style={styles.exerciseCount}>{exercise.count}</Text>
             </View>
           ))}

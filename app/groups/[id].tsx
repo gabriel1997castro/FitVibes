@@ -12,6 +12,7 @@ import {
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { translateExerciseType, translateExcuseCategory } from '../lib/exerciseTranslations';
 
 type Group = {
   id: string;
@@ -209,12 +210,12 @@ export default function GroupDetailsScreen() {
                   </Text>
                   {activity.type === 'exercise' && (
                     <Text style={styles.activityDetails}>
-                      {activity.exercise_type} - {activity.duration_minutes} minutos
+                      {translateExerciseType(activity.exercise_type)} - {activity.duration_minutes} minutos
                     </Text>
                   )}
                   {activity.type === 'excuse' && (
                     <Text style={styles.activityDetails}>
-                      {activity.excuse_category}
+                      {translateExcuseCategory(activity.excuse_category)}
                     </Text>
                   )}
                   <Text style={styles.activityDate}>

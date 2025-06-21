@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { translateExerciseType, translateExcuseCategory } from '../../lib/exerciseTranslations';
 
 const PREDEFINED_COMMENTS = [
   { id: 'good_job', text: 'Boa, continue assim! 💪' },
@@ -279,7 +280,7 @@ export default function VoteScreen() {
           {currentActivity.type === 'exercise' ? (
             <>
               <Text style={styles.activityType}>
-                {currentActivity.exercise_type}
+                {translateExerciseType(currentActivity.exercise_type)}
               </Text>
               <Text style={styles.activityDuration}>
                 {currentActivity.duration_minutes} minutos
@@ -288,7 +289,7 @@ export default function VoteScreen() {
           ) : (
             <>
               <Text style={styles.excuseCategory}>
-                {currentActivity.excuse_category}
+                {translateExcuseCategory(currentActivity.excuse_category)}
               </Text>
               {currentActivity.excuse_text && (
                 <Text style={styles.excuseText}>{currentActivity.excuse_text}</Text>
