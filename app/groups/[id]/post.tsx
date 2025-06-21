@@ -15,7 +15,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { checkAndAwardStreakAchievements, checkAndAwardVarietyAchievements } from '../../features/achievements';
+import { checkAndAwardStreakAchievements, checkAndAwardVarietyAchievements, checkAndAwardImmediateAchievements, updateGlobalStreakOnPost } from '../../features/achievements';
 
 const EXERCISE_TYPES = [
   { id: 'walking', name: 'Caminhada', icon: 'walk' as const },
@@ -202,11 +202,29 @@ export default function PostActivityScreen() {
 
       if (error) throw error;
 
+      console.log('Activity created successfully, checking achievements...');
+
       // Check and award achievements for each group
       for (const groupId of selectedGroups) {
+        console.log('Checking achievements for group:', groupId);
+        await checkAndAwardImmediateAchievements(user.id, groupId);
         await checkAndAwardStreakAchievements(user.id, groupId);
         await checkAndAwardVarietyAchievements(user.id, groupId);
       }
+
+      // Check global streak achievements (these are created by triggers, but we can verify)
+      console.log('Checking global streak achievements...');
+      const { data: userData } = await supabase
+        .from('users')
+        .select('global_streak_days, global_streak_record')
+        .eq('id', user.id)
+        .single();
+      
+      console.log('Current global streak:', userData?.global_streak_days);
+      console.log('Global streak record:', userData?.global_streak_record);
+
+      // Update global streak
+      await updateGlobalStreakOnPost(user.id);
 
       const groupCount = selectedGroups.length;
       const groupText = groupCount === 1 ? 'grupo' : 'grupos';

@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { getUserAchievements } from '../services/achievementsService';
 import { Achievement } from '../types/achievements';
@@ -41,9 +42,22 @@ export default function Profile() {
   const [groupRankings, setGroupRankings] = useState<GroupRanking[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchProfileData();
+  }, []);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchProfileData();
+    }, [])
+  );
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchProfileData().finally(() => setRefreshing(false));
   }, []);
 
   const fetchProfileData = async () => {
@@ -51,21 +65,26 @@ export default function Profile() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.replace('/auth/login');
+        router.replace('/login');
         return;
       }
       setUser(user);
 
+      console.log('Fetching profile data for user:', user.id);
+
       // Fetch achievements
       const achievementsData = await getUserAchievements(user.id);
+      console.log('Fetched achievements:', achievementsData?.length || 0);
       setAchievements(achievementsData || []);
 
       // Fetch user stats
       const stats = await fetchUserStats(user.id);
+      console.log('Fetched user stats:', stats);
       setUserStats(stats);
 
       // Fetch group rankings
       const rankings = await fetchGroupRankings(user.id);
+      console.log('Fetched group rankings:', rankings?.length || 0);
       setGroupRankings(rankings);
 
     } catch (error) {
@@ -235,7 +254,18 @@ export default function Profile() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#FF6B35']}
+          tintColor="#FF6B35"
+        />
+      }
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Perfil</Text>
