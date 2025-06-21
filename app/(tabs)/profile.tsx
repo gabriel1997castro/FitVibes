@@ -62,35 +62,29 @@ export default function Profile() {
   }, []);
 
   const fetchProfileData = async () => {
-    setLoading(true);
     try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      console.log('User:', user, 'Error:', userError);
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.replace('/login');
         return;
       }
+
       setUser(user);
 
-      console.log('Fetching profile data for user:', user.id);
+      // Fetch user stats, achievements, and group rankings
+      const [userStatsData, achievementsData, groupRankingsData] = await Promise.all([
+        fetchUserStats(user.id),
+        getUserAchievements(user.id),
+        fetchGroupRankings(user.id),
+      ]);
 
-      // Fetch achievements
-      const achievementsData = await getUserAchievements(user.id);
-      console.log('Fetched achievements:', achievementsData?.length || 0);
-      setAchievements(achievementsData || []);
-
-      // Fetch user stats
-      const stats = await fetchUserStats(user.id);
-      console.log('Fetched user stats:', stats);
-      setUserStats(stats);
-
-      // Fetch group rankings
-      const rankings = await fetchGroupRankings(user.id);
-      console.log('Fetched group rankings:', rankings?.length || 0);
-      setGroupRankings(rankings);
-
+      setUserStats(userStatsData);
+      setAchievements(achievementsData);
+      setGroupRankings(groupRankingsData);
     } catch (error) {
       console.error('Error fetching profile data:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados do perfil.');
     } finally {
       setLoading(false);
     }

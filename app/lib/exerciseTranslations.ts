@@ -30,4 +30,18 @@ export function translateExcuseCategory(excuseCategory: string | null | undefine
   if (!excuseCategory) return 'Desculpa';
   
   return EXCUSE_CATEGORY_TRANSLATIONS[excuseCategory] || excuseCategory;
+}
+
+// Função auxiliar para formatar lista de tipos de exercício
+export function formatExerciseTypesList(exerciseTypes: string[]): string {
+  const translatedTypes = exerciseTypes.map(type => translateExerciseType(type));
+  
+  if (translatedTypes.length === 1) {
+    return translatedTypes[0];
+  } else if (translatedTypes.length === 2) {
+    return `${translatedTypes[0]} e ${translatedTypes[1]}`;
+  } else {
+    const lastType = translatedTypes.pop();
+    return `${translatedTypes.join(', ')} e ${lastType}`;
+  }
 } 

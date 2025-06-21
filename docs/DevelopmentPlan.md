@@ -140,7 +140,15 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Apply translations to group details screen, voting screen, and profile
    - [X] Ensure consistent Portuguese language throughout the app
 
-2. **Data Consistency** ✅
+2. **Achievement System Improvements** ✅
+   - [X] **ENHANCED: Variety achievements now mention specific exercise types**
+   - [X] Create formatting function for exercise types list (e.g., "Caminhada, Corrida e Ciclismo")
+   - [X] Update achievement descriptions to include specific types
+   - [X] Update achievement notifications to show exercise types
+   - [X] Test formatting with various numbers of exercise types
+   - [X] **OPTIMIZED: Removed unnecessary update functions - new achievements already have correct descriptions**
+
+3. **Data Consistency** ✅
    - [X] Verify all exercise types are stored consistently in database
    - [X] Ensure excuse categories are properly translated
    - [X] Test translation functions with various input scenarios

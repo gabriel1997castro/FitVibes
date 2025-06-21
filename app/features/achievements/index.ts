@@ -2,6 +2,7 @@
 import { awardAchievementIfNotExists } from '../../services/achievementsService';
 import { AchievementType } from '../../types/achievements';
 import { supabase } from '../../services/supabase';
+import { formatExerciseTypesList } from '../../lib/exerciseTranslations';
 
 // Example streak thresholds (days)
 const STREAK_THRESHOLDS = [1, 14, 30, 60, 100];
@@ -67,12 +68,13 @@ export async function checkAndAwardVarietyAchievements(userId: string, groupId: 
   const uniqueTypes = Array.from(new Set(data.map((a: any) => a.exercise_type).filter(Boolean)));
   for (const threshold of VARIETY_THRESHOLDS) {
     if (uniqueTypes.length >= threshold) {
+      const typesList = formatExerciseTypesList(uniqueTypes);
       const achievement = {
         user_id: userId,
         group_id: groupId,
         type: AchievementType.Variety,
         title: `Variedade: ${threshold} tipos`,
-        description: `Você experimentou ${threshold} tipos diferentes de exercício!`,
+        description: `Você experimentou ${threshold} tipos diferentes de exercício: ${typesList}!`,
       };
       const awarded = await awardAchievementIfNotExists(achievement);
       if (awarded !== false) {
@@ -80,7 +82,7 @@ export async function checkAndAwardVarietyAchievements(userId: string, groupId: 
           userId,
           groupId,
           'Nova Conquista!',
-          `Parabéns! Você experimentou ${threshold} tipos de exercício.`
+          `Parabéns! Você experimentou ${threshold} tipos de exercício: ${typesList}.`
         );
       }
     }
@@ -139,12 +141,13 @@ export async function checkAndAwardImmediateAchievements(userId: string, groupId
 
     for (const threshold of VARIETY_THRESHOLDS) {
       if (uniqueTypes.length >= threshold) {
+        const typesList = formatExerciseTypesList(uniqueTypes);
         const achievement = {
           user_id: userId,
           group_id: groupId,
           type: AchievementType.Variety,
           title: `Variedade: ${threshold} tipos`,
-          description: `Você experimentou ${threshold} tipos diferentes de exercício!`,
+          description: `Você experimentou ${threshold} tipos diferentes de exercício: ${typesList}!`,
         };
         const awarded = await awardAchievementIfNotExists(achievement);
         if (awarded) {
@@ -153,7 +156,7 @@ export async function checkAndAwardImmediateAchievements(userId: string, groupId
             userId,
             groupId,
             'Nova Conquista!',
-            `Parabéns! Você experimentou ${threshold} tipos de exercício.`
+            `Parabéns! Você experimentou ${threshold} tipos de exercício: ${typesList}.`
           );
         }
       }
