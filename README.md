@@ -116,6 +116,8 @@ fitvibes/
 - [Plano de Desenvolvimento](docs/DevelopmentPlan.md)
 - [Sistema de Notificações](docs/Notifications-System.md)
 - [Design e UX](docs/Design-Manus.md)
+- [Brief Detalhado para Design](docs/Design-Brief-Detailed.md)
+- [Brief Executivo para Design](docs/Design-Brief-Executive.md)
 
 ## 🤝 Contribuição
 
