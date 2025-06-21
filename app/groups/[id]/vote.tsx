@@ -44,6 +44,10 @@ export default function VoteScreen() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [voting, setVoting] = useState(false);
+  
+  // New state for vote selection
+  const [selectedVote, setSelectedVote] = useState<'valid' | 'invalid' | null>(null);
+  const [selectedComment, setSelectedComment] = useState<string | null>(null);
 
   useEffect(() => {
     fetchActivities();
@@ -80,8 +84,18 @@ export default function VoteScreen() {
     }
   };
 
-  const handleVote = async (isValid: boolean, commentId?: string) => {
-    if (!activities[currentIndex]) return;
+  const handleVoteSelection = (vote: 'valid' | 'invalid') => {
+    setSelectedVote(vote);
+    // Reset comment when changing vote
+    setSelectedComment(null);
+  };
+
+  const handleCommentSelection = (commentId: string) => {
+    setSelectedComment(selectedComment === commentId ? null : commentId);
+  };
+
+  const handleConfirmVote = async () => {
+    if (!selectedVote || !activities[currentIndex]) return;
 
     setVoting(true);
     try {
@@ -95,14 +109,14 @@ export default function VoteScreen() {
       }
 
       // Insert vote
-      console.log('Inserting vote with comment_type:', commentId);
+      console.log('Inserting vote with comment_type:', selectedComment);
       const { error: voteError } = await supabase
         .from('votes')
         .insert({
           activity_id: activities[currentIndex].id,
           voter_id: user.id,
-          is_valid: isValid,
-          comment_type: commentId || null
+          is_valid: selectedVote === 'valid',
+          comment_type: selectedComment || null
         });
 
       if (voteError) {
@@ -215,6 +229,10 @@ export default function VoteScreen() {
         });
       }
 
+      // Reset state for next activity
+      setSelectedVote(null);
+      setSelectedComment(null);
+
       // Move to next activity
       if (currentIndex < activities.length - 1) {
         setCurrentIndex(currentIndex + 1);
@@ -251,6 +269,7 @@ export default function VoteScreen() {
   }
 
   const currentActivity = activities[currentIndex];
+  const canConfirm = selectedVote !== null;
 
   return (
     <ScrollView style={styles.container}>
@@ -300,39 +319,76 @@ export default function VoteScreen() {
           )}
         </View>
 
-        <View style={styles.voteButtons}>
-          <TouchableOpacity
-            style={[styles.voteButton, styles.validButton]}
-            onPress={() => handleVote(true)}
-            disabled={voting}
-          >
-            <MaterialCommunityIcons name="check" size={24} color="#fff" />
-            <Text style={styles.voteButtonText}>Válido</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.voteButton, styles.invalidButton]}
-            onPress={() => handleVote(false)}
-            disabled={voting}
-          >
-            <MaterialCommunityIcons name="close" size={24} color="#fff" />
-            <Text style={styles.voteButtonText}>Migué</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.commentsContainer}>
-          <Text style={styles.commentsTitle}>Comentários:</Text>
-          {PREDEFINED_COMMENTS.map((comment) => (
+        {/* Vote Selection */}
+        <View style={styles.voteSection}>
+          <Text style={styles.sectionTitle}>Seu voto:</Text>
+          <View style={styles.voteButtons}>
             <TouchableOpacity
-              key={comment.id}
-              style={styles.commentButton}
-              onPress={() => handleVote(true, comment.id)}
+              style={[
+                styles.voteButton,
+                styles.validButton,
+                selectedVote === 'valid' && styles.selectedVoteButton
+              ]}
+              onPress={() => handleVoteSelection('valid')}
               disabled={voting}
             >
-              <Text style={styles.commentText}>{comment.text}</Text>
+              <MaterialCommunityIcons name="check" size={24} color="#fff" />
+              <Text style={styles.voteButtonText}>Válido</Text>
             </TouchableOpacity>
-          ))}
+
+            <TouchableOpacity
+              style={[
+                styles.voteButton,
+                styles.invalidButton,
+                selectedVote === 'invalid' && styles.selectedVoteButton
+              ]}
+              onPress={() => handleVoteSelection('invalid')}
+              disabled={voting}
+            >
+              <MaterialCommunityIcons name="close" size={24} color="#fff" />
+              <Text style={styles.voteButtonText}>Migué</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+
+        {/* Comment Selection (only show if vote is selected) */}
+        {selectedVote && (
+          <View style={styles.commentsSection}>
+            <Text style={styles.sectionTitle}>Comentário (opcional):</Text>
+            {PREDEFINED_COMMENTS.map((comment) => (
+              <TouchableOpacity
+                key={comment.id}
+                style={[
+                  styles.commentButton,
+                  selectedComment === comment.id && styles.selectedCommentButton
+                ]}
+                onPress={() => handleCommentSelection(comment.id)}
+                disabled={voting}
+              >
+                <Text style={[
+                  styles.commentText,
+                  selectedComment === comment.id && styles.selectedCommentText
+                ]}>
+                  {comment.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Confirm Button */}
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            !canConfirm && styles.disabledConfirmButton
+          ]}
+          onPress={handleConfirmVote}
+          disabled={!canConfirm || voting}
+        >
+          <Text style={styles.confirmButtonText}>
+            {voting ? 'Enviando...' : 'Confirmar Voto'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -426,6 +482,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
+  voteSection: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
   voteButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -446,20 +511,17 @@ const styles = StyleSheet.create({
   invalidButton: {
     backgroundColor: '#EF4444',
   },
+  selectedVoteButton: {
+    backgroundColor: '#FF6B35',
+  },
   voteButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
-  commentsContainer: {
+  commentsSection: {
     marginTop: 16,
-  },
-  commentsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
   },
   commentButton: {
     padding: 12,
@@ -467,8 +529,28 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
+  selectedCommentButton: {
+    backgroundColor: '#FF6B35',
+  },
   commentText: {
     fontSize: 14,
     color: '#1F2937',
+  },
+  selectedCommentText: {
+    fontWeight: '600',
+  },
+  confirmButton: {
+    backgroundColor: '#FF6B35',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  disabledConfirmButton: {
+    backgroundColor: '#E5E7EB',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 

@@ -157,7 +157,15 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Add navigation from group activities list to details
    - [X] Implement proper loading and error states
 
-4. **Data Consistency** ✅
+4. **Voting System UX Improvements** ✅
+   - [X] **FIXED: Confusing comment system that automatically voted as valid**
+   - [X] Implemented clear two-step voting process: vote selection + optional comment
+   - [X] Added visual feedback for selected vote and comment
+   - [X] Created confirmation button that only enables after vote selection
+   - [X] Comments are now truly optional and independent of vote choice
+   - [X] Improved UX flow: Select vote → (optional) Select comment → Confirm
+
+5. **Data Consistency** ✅
    - [X] Verify all exercise types are stored consistently in database
    - [X] Ensure excuse categories are properly translated
    - [X] Test translation functions with various input scenarios
