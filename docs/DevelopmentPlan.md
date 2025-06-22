@@ -18,15 +18,15 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Set up database migrations
    - [X] Configure connection pooling
 
-3. **Authentication System**
+3. **Authentication System** ✅
    - [X] Implement user registration
    - [X] Implement login with email/password
    - [ ] Add social login (Google, Apple)
    - [X] Set up JWT authentication
    - [X] Create protected routes
 
-### Phase 2: Core Features - Groups 
-1. **Group Management**
+### Phase 2: Core Features - Groups ✅ COMPLETED
+1. **Group Management** ✅
    - [X] Create group creation flow
    - [X] Implement group settings
    - [X] Add group member management
@@ -40,19 +40,19 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Implement group member list
    - [X] Add group invite UI
 
-### Phase 3: Activities and Posts 
+### Phase 3: Activities and Posts ✅ COMPLETED
 1. **Activity System** ✅
    - [X] Create activity posting flow
    - [X] Implement exercise type selection
    - [X] Add duration tracking
    - [X] Create excuse system
    - [X] Implement auto-excuse feature
-   - [X] **NEW: Multi-group posting support**
+   - [X] **Multi-group posting support**
 
-2. **Activity UI**
+2. **Activity UI** ✅
    - [X] Design activity feed
    - [X] Create activity posting screen
-   - [ ] Implement activity detail view
+   - [X] Implement activity detail view
    - [X] Add activity history
    - [ ] Create activity statistics
 
@@ -93,7 +93,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Add achievement triggers
    - [X] Implement streak system (Global + Group-specific)
    - [X] Create achievement notifications
-   - [X] **FIXED: Achievement notification triggers and RLS policies**
+   - [X] **Achievement notification triggers and RLS policies**
 
 2. **Achievement UI** ✅
    - [X] Design achievement screen (Profile tab)
@@ -101,7 +101,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Add achievement progress
    - [X] Implement achievement notifications
    - [X] Create achievement statistics
-   - [X] **FIXED: Notifications screen authentication and Supabase client consistency**
+   - [X] **Notifications screen authentication and Supabase client consistency**
 
 ### Phase 7: Profile and Statistics ✅ COMPLETED
 1. **Profile System** ✅
@@ -133,23 +133,22 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Create efficient user stats queries
    - [X] Implement proper RLS policies
 
-### Phase 8.5: Bug Fixes and Immediate Improvements ✅ COMPLETED
+### Phase 8.5: Bug Fixes and UI Improvements ✅ COMPLETED
 1. **Localization and UI Fixes** ✅
-   - [X] **FIXED: Exercise types displaying in English instead of Portuguese**
+   - [X] **Exercise types displaying in Portuguese**
    - [X] Create translation utility functions for exercise types and excuse categories
    - [X] Apply translations to group details screen, voting screen, and profile
    - [X] Ensure consistent Portuguese language throughout the app
 
 2. **Achievement System Improvements** ✅
-   - [X] **ENHANCED: Variety achievements now mention specific exercise types**
-   - [X] Create formatting function for exercise types list (e.g., "Caminhada, Corrida e Ciclismo")
+   - [X] **Variety achievements mention specific exercise types**
+   - [X] Create formatting function for exercise types list
    - [X] Update achievement descriptions to include specific types
    - [X] Update achievement notifications to show exercise types
    - [X] Test formatting with various numbers of exercise types
-   - [X] **OPTIMIZED: Removed unnecessary update functions - new achievements already have correct descriptions**
 
 3. **Activity Details and Voting Results** ✅
-   - [X] **NEW: Created activity details screen** (`/groups/[id]/activity/[activityId]`)
+   - [X] **Created activity details screen** (`/groups/[id]/activity/[activityId]`)
    - [X] Display complete activity information (type, duration, excuse details)
    - [X] Show voting results summary (valid/invalid counts)
    - [X] List individual votes with voter names and timestamps
@@ -158,61 +157,52 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [X] Implement proper loading and error states
 
 4. **Voting System UX Improvements** ✅
-   - [X] **FIXED: Confusing comment system that automatically voted as valid**
-   - [X] Implemented clear two-step voting process: vote selection + optional comment
+   - [X] **Two-step voting process: vote selection + optional comment**
    - [X] Added visual feedback for selected vote and comment
    - [X] Created confirmation button that only enables after vote selection
    - [X] Comments are now truly optional and independent of vote choice
-   - [X] Improved UX flow: Select vote → (optional) Select comment → Confirm
-   - [X] **ENHANCED: Smart activity navigation flow**
+   - [X] **Smart activity navigation flow**
    - [X] Activities with 'pending' status redirect to voting screen when clicked
    - [X] After voting, automatically redirect to activity details to see results
-   - [X] Added "Ver Detalhes da Atividade" button in voting screen
    - [X] Improved user flow: Click pending activity → Vote → See results → Continue
 
 5. **Status Display Fixes** ✅
-   - [X] **FIXED: Status 'pending' not displaying correctly in activities list**
+   - [X] **Status 'pending' displays correctly in activities list**
    - [X] Added proper handling for all three status types: valid, invalid, pending
    - [X] Implemented consistent color coding: green (valid), red (invalid), yellow (pending)
    - [X] Created reusable status utility functions for consistency
    - [X] Applied same status logic to both group list and activity details screens
 
-6. **Data Consistency** ✅
-   - [X] Verify all exercise types are stored consistently in database
-   - [X] Ensure excuse categories are properly translated
-   - [X] Test translation functions with various input scenarios
-
-7. **Navigation Flow Fixes** ✅
-   - [X] **FIXED: Loop infinito de redirecionamento entre votação e detalhes**
-   - [X] **IMPLEMENTED: Novo fluxo de navegação conforme solicitado**
-   - [X] Clicar em atividade pendente → Votação daquela atividade específica
-   - [X] Após votar → Redirecionar para detalhes daquela atividade
-   - [X] Clicar no ícone de informações → Direto para detalhes da atividade
-   - [X] Suporte para votação de atividade específica via parâmetro activityId
-   - [X] Mantido fluxo original para votação em múltiplas atividades
-   - [X] **REMOVED: Botão de informações da tela de votação**
-   - [X] Usuário agora é obrigado a votar para ver detalhes da atividade
-   - [X] **IMPROVED: UI dos botões de votação**
-   - [X] Botões com fundo claro e bordas coloridas
-   - [X] Ícones verdes para "Válido" e vermelhos para "Migué"
-   - [X] Estado selecionado com fundo laranja e texto branco
-   - [X] **IMPROVED: Navegação da tela de detalhes da atividade**
-   - [X] Configurado botão de voltar nativo do header
-   - [X] Botão voltar redireciona para a página do grupo
-   - [X] Header com título "Detalhes da Atividade" e "Grupo" como texto de voltar
-   - [X] **IMPROVED: Manipulação do histórico de navegação após votação**
-   - [X] Após votar, histórico é manipulado para voltar direto para o grupo
-   - [X] Usa router.replace para substituir rota de votação pela rota do grupo
-   - [X] Botão voltar nativo agora funciona corretamente após votação
-   - [X] **IMPROVED: Interface da tela do grupo**
-   - [X] Removida seção de membros da tela principal do grupo
-   - [X] Interface mais limpa e focada nas ações principais (postar, votar)
-   - [X] Membros agora são exibidos apenas na tela de configurações
-   - [X] Carregamento mais rápido e menos distrações visuais
-   - [X] **IMPROVED: Navegação para atividades próprias**
-   - [X] Usuário não é redirecionado para votação quando clica em sua própria atividade pendente
-   - [X] Pode ver detalhes de suas próprias atividades mesmo quando pendentes
-   - [X] Redirecionamento para votação apenas para atividades de outros usuários
+6. **Navigation Flow Fixes** ✅
+   - [X] **Fixed infinite redirect loop between voting and details**
+   - [X] **Implemented new navigation flow as requested**
+   - [X] Click pending activity → Vote that specific activity
+   - [X] After voting → Redirect to details of that activity
+   - [X] Support for voting specific activity via activityId parameter
+   - [X] Maintained original flow for voting multiple activities
+   - [X] **Removed info button from voting screen**
+   - [X] User now must vote to see activity details
+   - [X] **Improved voting button UI**
+   - [X] Buttons with light backgrounds and colored borders
+   - [X] Green icons for "Válido" and red icons for "Migué"
+   - [X] Selected state with orange background and white text
+   - [X] **Improved activity details screen navigation**
+   - [X] Configured native back button in header
+   - [X] Back button redirects to group page
+   - [X] Header with "Detalhes da Atividade" title and "Grupo" as back text
+   - [X] **Improved navigation history manipulation after voting**
+   - [X] After voting, history is manipulated to go back directly to group
+   - [X] Uses router.replace to replace voting route with group route
+   - [X] Native back button now works correctly after voting
+   - [X] **Improved group screen interface**
+   - [X] Removed members section from main group screen
+   - [X] Cleaner interface focused on main actions (post, vote)
+   - [X] Members now displayed only in settings screen
+   - [X] Faster loading and fewer visual distractions
+   - [X] **Improved navigation for own activities**
+   - [X] User not redirected to voting when clicking their own pending activity
+   - [X] Can see details of their own activities even when pending
+   - [X] Redirect to voting only for other users' activities
 
 ### Phase 9: Testing and Optimization 🔄 IN PROGRESS
 1. **Testing**
@@ -270,6 +260,10 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 - **Achievement System**: Global/group streaks, variety, social achievements
 - **Profile System**: Comprehensive stats, achievements, rankings
 - **Database**: Complete schema with triggers, functions, and RLS policies
+- **Localization**: Portuguese translations for exercise types and excuse categories
+- **Activity Details**: Complete activity details screen with voting results
+- **Smart Navigation**: Intelligent navigation flow for voting and details
+- **UI Improvements**: Enhanced voting buttons, clean group interface
 
 ### 🔄 In Progress
 - **Testing**: Unit and integration tests
@@ -305,12 +299,17 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 - **Optimized queries**: Efficient SQL functions for complex data aggregation
 - **Secure architecture**: Comprehensive RLS policies and input validation
 - **Notification system**: Complete achievement and balance notifications with proper authentication
+- **Localization system**: Portuguese translations for all exercise types and excuse categories
+- **Smart navigation**: Intelligent routing based on activity status and user ownership
 
 ### Critical Issues Resolved
 - **Supabase Client Duplication**: Fixed authentication issues caused by multiple Supabase client instances
 - **RLS Policy Conflicts**: Resolved permission denied errors for notifications table
 - **Achievement Notifications**: Implemented automatic notification creation for achievements via database triggers
 - **Authentication Context**: Ensured consistent authentication state across all app components
+- **Translation System**: Created comprehensive translation utilities for exercise types and excuse categories
+- **Navigation Flow**: Fixed infinite redirect loops and implemented smart navigation logic
+- **UI Consistency**: Standardized status displays and voting interface across all screens
 
 ## 📋 Development Guidelines
 
@@ -353,6 +352,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 - [X] Phase 6: Gamification and Achievements (100%)
 - [X] Phase 7: Profile and Statistics (100%)
 - [X] Phase 8: Advanced Features (100%)
+- [X] Phase 8.5: Bug Fixes and UI Improvements (100%)
 - 🔄 Phase 9: Testing and Optimization (20%)
 - 📋 Phase 10: Deployment and Launch (0%)
 - 📋 Phase 11: Post-Launch (0%)
@@ -362,11 +362,12 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 - **Performance**: Good - Optimized queries, efficient UI updates
 - **Security**: High - RLS policies, input validation, secure authentication
 - **User Experience**: Excellent - Intuitive UI, smooth navigation, real-time updates
+- **Localization**: Complete - Portuguese translations for all user-facing content
 
 ### Timeline Adherence
 - **Original Timeline**: 8 weeks for MVP
 - **Current Status**: Core MVP completed in ~6 weeks
-- **Additional Features**: Multi-group support, advanced achievements, comprehensive profile
+- **Additional Features**: Multi-group support, advanced achievements, comprehensive profile, localization
 - **Next Milestone**: Testing and optimization phase
 
 ## 🔄 Daily Development Workflow
@@ -458,29 +459,21 @@ The project will be considered successful when:
 
 ## 🚀 Immediate Next Steps (Next 2-3 Days)
 
-### Priority 1: Critical Bug Fixes
-1. **Exercise Type Translation** ✅ **COMPLETED**
-   - [X] Create translation utility functions
-   - [X] Apply translations to all screens
-   - [X] Test with various exercise types
+### Priority 1: Testing and Quality Assurance
+1. **Manual Testing**
+   - [ ] Test all user flows end-to-end
+   - [ ] Verify multi-group posting functionality
+   - [ ] Test achievement system thoroughly
+   - [ ] Validate notification system
+   - [ ] Test translation system with various inputs
 
-2. **Data Validation and Consistency**
-   - [ ] Verify all existing activities have proper exercise type values
-   - [ ] Check for any remaining English text in the UI
-   - [ ] Test edge cases with null/undefined exercise types
+2. **Edge Cases**
+   - [ ] Test with large groups (50+ members)
+   - [ ] Verify behavior with network issues
+   - [ ] Test with different device sizes
+   - [ ] Validate accessibility features
 
-### Priority 2: UI/UX Improvements
-1. **Visual Polish**
-   - [ ] Review and improve loading states across all screens
-   - [ ] Add subtle animations for better user feedback
-   - [ ] Ensure consistent spacing and typography
-
-2. **Error Handling**
-   - [ ] Improve error messages for better user understanding
-   - [ ] Add retry mechanisms for failed operations
-   - [ ] Implement offline state handling
-
-### Priority 3: Performance Optimization
+### Priority 2: Performance Optimization
 1. **Database Queries**
    - [ ] Review and optimize slow queries
    - [ ] Add proper indexing for frequently accessed data
@@ -491,18 +484,16 @@ The project will be considered successful when:
    - [ ] Implement lazy loading for long lists
    - [ ] Reduce bundle size and improve startup time
 
-### Priority 4: Testing and Quality Assurance
-1. **Manual Testing**
-   - [ ] Test all user flows end-to-end
-   - [ ] Verify multi-group posting functionality
-   - [ ] Test achievement system thoroughly
-   - [ ] Validate notification system
+### Priority 3: UI/UX Polish
+1. **Visual Polish**
+   - [ ] Review and improve loading states across all screens
+   - [ ] Add subtle animations for better user feedback
+   - [ ] Ensure consistent spacing and typography
 
-2. **Edge Cases**
-   - [ ] Test with large groups (50+ members)
-   - [ ] Verify behavior with network issues
-   - [ ] Test with different device sizes
-   - [ ] Validate accessibility features
+2. **Error Handling**
+   - [ ] Improve error messages for better user understanding
+   - [ ] Add retry mechanisms for failed operations
+   - [ ] Implement offline state handling
 
 ## 🎯 Success Criteria for Next Phase
 

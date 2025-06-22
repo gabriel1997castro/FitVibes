@@ -458,6 +458,53 @@ RETURNS TABLE (
 - Real-time achievement notifications
 - Achievement progress tracking
 
+#### 5. Localization System
+```typescript
+// Translation utilities for exercise types and excuse categories
+export const EXERCISE_TYPE_TRANSLATIONS: Record<string, string> = {
+  'walking': 'Caminhada',
+  'running': 'Corrida',
+  'cycling': 'Ciclismo',
+  'swimming': 'Natação',
+  'gym': 'Academia',
+  'yoga': 'Yoga',
+  'other': 'Outro',
+};
+
+export function translateExerciseType(exerciseType: string | null | undefined): string {
+  if (!exerciseType) return 'Exercício';
+  return EXERCISE_TYPE_TRANSLATIONS[exerciseType] || exerciseType;
+}
+```
+
+#### 6. Smart Navigation System
+- Intelligent routing based on activity status (pending/valid/invalid)
+  - Navigation history manipulation for optimal UX
+
+#### 7. Enhanced Voting System
+- Two-step voting process: vote selection + optional comment
+- Visual feedback for selected vote and comment
+- Confirmation button that only enables after vote selection
+- Comments truly optional and independent of vote choice
+
+#### 8. Activity Details Screen
+- Complete activity information display
+- Voting results summary with counts
+- Individual votes with voter names and timestamps
+- Comments display from voting process
+- Status-based color coding (valid/invalid/pending)
+
+#### 9. Auto-Excuse System
+```typescript
+// Random excuse generation for missed activities
+const AUTO_EXCUSE_MESSAGES = [
+  "Hoje não treinei porque fui muito migué! 😅",
+  "Meu gato comeu minha roupa de treino... de novo! 😺",
+  "A Netflix lançou uma nova temporada e eu não resisti! 📺",
+  // ... more creative excuses
+];
+```
+
 ---
 
 ## 📁 Current Folder Structure
@@ -467,25 +514,26 @@ fitvibes/
 ├── app/                      # App entry point and configuration
 │   ├── (tabs)/              # Tab-based navigation screens
 │   │   ├── groups.tsx       # Groups list screen
-│   │   ├── activities.tsx   # Activities feed (placeholder)
-│   │   ├── ranking.tsx      # Rankings screen (placeholder)
+│   │   ├── activities.tsx   # Activities feed (placeholder - not implemented)
+│   │   ├── ranking.tsx      # Rankings screen (placeholder - not implemented)
 │   │   ├── notifications.tsx # Notifications screen
 │   │   ├── profile.tsx      # User profile with achievements
 │   │   └── _layout.tsx      # Tab navigation layout
 │   ├── groups/              # Group-related screens
 │   │   ├── [id]/           # Dynamic group routes
-│   │   │   ├── post.tsx    # Activity posting screen
-│   │   │   ├── vote.tsx    # Voting screen
+│   │   │   ├── post.tsx    # Activity posting screen (multi-group support)
+│   │   │   ├── vote.tsx    # Voting screen (with activity-specific voting)
 │   │   │   ├── balance.tsx # Balance/payments screen
-│   │   │   └── settings.tsx # Group settings screen
-│   │   ├── [id].tsx        # Group details screen
+│   │   │   ├── settings.tsx # Group settings screen
+│   │   │   └── activity/   # Activity-related screens
+│   │   │       └── [activityId].tsx # Activity details screen
+│   │   ├── [id].tsx        # Group details screen (members removed)
 │   │   └── create.tsx      # Group creation screen
 │   ├── screens/            # Reusable screen components
 │   │   ├── LoginScreen.tsx
 │   │   ├── RegisterScreen.tsx
 │   │   ├── GroupListScreen.tsx
-│   │   ├── CreateGroupScreen.tsx
-│   │   └── GroupSettingsScreen.tsx
+│   │   └── CreateGroupScreen.tsx
 │   ├── features/           # Feature-specific logic
 │   │   └── achievements/   # Achievement system
 │   │       └── index.ts    # Achievement logic
@@ -495,6 +543,7 @@ fitvibes/
 │   ├── types/              # TypeScript type definitions
 │   │   └── achievements.ts # Achievement types
 │   ├── lib/                # Utility functions
+│   │   └── exerciseTranslations.ts # Translation utilities
 │   ├── contexts/           # React contexts
 │   ├── _layout.tsx         # Root layout with auth
 │   ├── index.tsx           # Entry point
@@ -522,15 +571,16 @@ fitvibes/
 
 ## 🚀 Development Roadmap
 
-### ✅ Completed Phases (1-8)
+### ✅ Completed Phases (1-8.5)
 1. **Project Setup and Authentication** - Complete
 2. **Core Features - Groups** - Complete
 3. **Activities and Posts** - Complete with multi-group support
-4. **Voting System** - Complete
+4. **Voting System** - Complete with enhanced UX
 5. **Balance and Payments** - Complete
 6. **Gamification and Achievements** - Complete
 7. **Profile and Statistics** - Complete
 8. **Advanced Features** - Complete
+8.5. **Bug Fixes and UI Improvements** - Complete
 
 ### 🔄 Current Phase (9)
 **Testing and Optimization**
@@ -559,6 +609,12 @@ fitvibes/
 - **Achievement system**: Automatic detection and visual differentiation
 - **Comprehensive profile**: Detailed statistics and achievements display
 - **Notification system**: Complete achievement and balance notifications with proper authentication
+- **Localization system**: Complete Portuguese translations for exercise types and excuse categories
+- **Smart navigation**: Intelligent routing based on activity status and user ownership
+- **Enhanced voting**: Two-step voting process with optional comments
+- **Activity details**: Complete activity details screen with voting results and comments
+- **Auto-excuse system**: Creative automatic excuses for missed activities
+- **UI consistency**: Standardized status displays and voting interface across all screens
 
 ### User Experience Achievements
 - **Intuitive navigation**: File-based routing with Expo Router
@@ -566,6 +622,11 @@ fitvibes/
 - **Visual feedback**: Achievement badges, progress indicators, status updates
 - **Multi-platform**: iOS and Android support with Expo
 - **Social features**: Group management, voting, balance tracking
+- **Smart navigation flow**: Intelligent routing based on activity status and user ownership
+- **Enhanced voting experience**: Clear two-step process with visual feedback
+- **Localized interface**: Complete Portuguese language support
+- **Activity transparency**: Detailed activity information and voting results
+- **Clean group interface**: Streamlined design focused on main actions
 
 ### Performance Achievements
 - **Fast loading**: Optimized database queries and efficient data fetching
@@ -664,5 +725,5 @@ fitvibes/
 ---
 
 **Documento atualizado em:** Junho 2025  
-**Versão:** 2.0  
-**Status:** MVP Completo - Fase de Testes e Otimização 
+**Versão:** 2.1  
+**Status:** MVP Completo com Melhorias de UX - Fase de Testes e Otimização 
