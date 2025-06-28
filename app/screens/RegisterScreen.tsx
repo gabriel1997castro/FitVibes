@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../services/supabase';
@@ -83,11 +84,24 @@ export default function RegisterScreen() {
   const handleGoogleSignUp = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: 'exp://192.168.0.11:8081',
+        },
       });
-      if (error) throw error;
+      if (error) {
+        console.log('OAuth error:', error);
+        Alert.alert('Error', error.message);
+      } else {
+        console.log('OAuth initiated successfully');
+        // Open the Google OAuth URL in browser
+        if (data?.url) {
+          await Linking.openURL(data.url);
+        }
+      }
     } catch (error) {
+      console.log('Catch error:', error);
       Alert.alert('Error', error.message);
     } finally {
       setLoading(false);

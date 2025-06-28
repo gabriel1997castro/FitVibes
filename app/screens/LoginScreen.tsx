@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, Platform } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, Platform, Linking } from 'react-native';
 import { supabase } from '../services/supabase';
 import { useRouter } from 'expo-router';
+import { GoogleSignin, GoogleSigninButton, isSuccessResponse, User } from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+  scopes: ['https://www.googleapis.com/auth/drive'],
+  iosClientId: process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_IOS,
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_WEB
+})
 
 export default function LoginScreen() {
+  // const [auth, setAuth] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,11 +61,18 @@ export default function LoginScreen() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-      });
-      if (error) throw error;
+      const playServices = await GoogleSignin.hasPlayServices()
+      console.log({playServices})
+      const response = await GoogleSignin.signIn()
+      console.log({response})
+      if(isSuccessResponse(response)) {
+
+        const { data, error} = await supabase.auth.signInWithIdToken({ provider: 'google', token: response.data.idToken })
+        console.log(data, error)
+
+      } else throw new Error('Google sign in failed');
     } catch (error) {
+      console.log('Catch error:', error);
       Alert.alert('Erro', error.message);
     } finally {
       setLoading(false);
@@ -117,13 +132,20 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity
+         {/*} <TouchableOpacity
             style={styles.socialButton}
             onPress={handleGoogleLogin}
             disabled={loading}
           >
             <Text style={styles.socialButtonText}>Continuar com Google</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>*/}
+
+          <GoogleSigninButton
+            size={GoogleSigninButton.Size.Wide}
+            color={GoogleSigninButton.Color.Dark}
+            onPress={handleGoogleLogin}
+            disabled={loading}
+          />
 
           <TouchableOpacity
             style={styles.socialButton}

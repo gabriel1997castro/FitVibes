@@ -1,10 +1,21 @@
 {
   "expo": {
-    "scheme": "acme",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.844805817982-nbot0jk9o2e27ncov29gqbub23go4rdo"
+        }
+      ]
     ],
     "name": "FitVibes",
-    "slug": "FitVibes"
+    "slug": "FitVibes",
+    "ios": {
+      "bundleIdentifier": "com.fitvibes.app"
+    },
+    "android": {
+      "package": "com.fitvibes.app"
+    }
   }
 }

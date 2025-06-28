@@ -79,6 +79,41 @@ npx eas build
 npx eas deploy
 ```
 
+### Google SignIn
+In your project's top-level build.gradle file, ensure that Google's Maven repository is included:
+
+
+```
+allprojects {
+    repositories {
+        google()
+
+        // If you're using a version of Gradle lower than 4.1, you must instead use:
+        // maven {
+        //     url 'https://maven.google.com'
+        // }
+    }
+}
+```
+Then, in your app-level build.gradle file, declare Google Play services as a dependency:
+
+```
+apply plugin: 'com.android.application'
+    ...
+
+    dependencies {
+        implementation 'com.google.android.gms:play-services-auth:21.3.0'
+    }
+```
+ref: https://developer.android.com/identity/legacy/gsi
+
+Put also the line with client id in android/app/src/main/res/values/strings.xml
+```
+<string name="server_client_id">844805817982-92ja2fuknng36v134rfekt0b81qsojf9.apps.googleusercontent.com</string>
+```
+
+Add also a web client.
+
 ## 📁 Estrutura do Projeto
 
 ```

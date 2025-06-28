@@ -64,3 +64,30 @@ coverage/
 
 # VSCode
 .vscode/
+
+# Android
+android/
+android/.gradle/
+android/.idea/
+android/.cxx/
+android/local.properties
+android/app/debug/
+android/app/release/
+android/app/profile/
+android/app/.cxx/
+android/app/build/
+android/build/
+*.iml
+.gradle/
+*.keystore
+*.jks
+*.apk
+*.ap_*
+*.dex
+*.class
+*.log
+captures/
+output.json
+# End Android
+
+ios/
