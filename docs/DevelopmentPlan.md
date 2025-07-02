@@ -1,6 +1,6 @@
 # 🚀 FitVibes Development Plan
 
-This document outlines the step-by-step development plan for the FitVibes app, including timelines, tasks, and guidelines.
+Este documento detalha o plano de desenvolvimento do FitVibes, incluindo as fases, tarefas e diretrizes, já considerando o sistema de ciclos de pagamento, penalidades e histórico detalhado implementados.
 
 ## 📅 Development Phases
 
@@ -73,18 +73,20 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 
 ### Phase 5: Balance and Payments ✅ COMPLETED
 1. **Balance System** ✅
-   - [X] Implement balance tracking
-   - [X] Create payment cycle system
-   - [X] Add balance calculations
-   - [X] Implement payment marking
-   - [X] Create balance notifications
+   - [X] Implementação de ciclos de pagamento por grupo (semanal/mensal)
+   - [X] Backend responsável por consolidar saldos por ciclo e par de usuários
+   - [X] Registro detalhado de penalidades em `payment_history`
+   - [X] Tela de saldos exibe ciclo atual, saldos por par, botão "Marcar como pago"
+   - [X] Tela de histórico exibe todas as penalidades, com detalhes e filtros
+   - [X] Notificações de fechamento de ciclo implementadas
+   - [X] Permissões e RLS revisadas para segurança e transparência
 
 2. **Balance UI** ✅
-   - [X] Design balance screen
-   - [X] Create payment history
-   - [X] Add balance statistics
-   - [X] Implement payment marking UI
-   - [X] Create balance notifications
+   - [X] Design da tela de saldos com ciclos e status visual (💰, ⏳, ✔️)
+   - [X] Tela de histórico detalhado de penalidades
+   - [X] Filtros por grupo/ciclo
+   - [X] Botão único "Marcar como pago" por par
+   - [X] Exibição de saldos quitados recentemente
 
 ### Phase 6: Gamification and Achievements ✅ COMPLETED
 1. **Achievement System** ✅
@@ -135,74 +137,13 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 
 ### Phase 8.5: Bug Fixes and UI Improvements ✅ COMPLETED
 1. **Localization and UI Fixes** ✅
-   - [X] **Exercise types displaying in Portuguese**
-   - [X] Create translation utility functions for exercise types and excuse categories
-   - [X] Apply translations to group details screen, voting screen, and profile
-   - [X] Ensure consistent Portuguese language throughout the app
-
-2. **Achievement System Improvements** ✅
-   - [X] **Variety achievements mention specific exercise types**
-   - [X] Create formatting function for exercise types list
-   - [X] Update achievement descriptions to include specific types
-   - [X] Update achievement notifications to show exercise types
-   - [X] Test formatting with various numbers of exercise types
-
-3. **Activity Details and Voting Results** ✅
-   - [X] **Created activity details screen** (`/groups/[id]/activity/[activityId]`)
-   - [X] Display complete activity information (type, duration, excuse details)
-   - [X] Show voting results summary (valid/invalid counts)
-   - [X] List individual votes with voter names and timestamps
-   - [X] Display comments made during voting
-   - [X] Add navigation from group activities list to details
-   - [X] Implement proper loading and error states
-
-4. **Voting System UX Improvements** ✅
-   - [X] **Two-step voting process: vote selection + optional comment**
-   - [X] Added visual feedback for selected vote and comment
-   - [X] Created confirmation button that only enables after vote selection
-   - [X] Comments are now truly optional and independent of vote choice
-   - [X] **Smart activity navigation flow**
-   - [X] Activities with 'pending' status redirect to voting screen when clicked
-   - [X] After voting, automatically redirect to activity details to see results
-   - [X] Improved user flow: Click pending activity → Vote → See results → Continue
-
-5. **Status Display Fixes** ✅
-   - [X] **Status 'pending' displays correctly in activities list**
-   - [X] Added proper handling for all three status types: valid, invalid, pending
-   - [X] Implemented consistent color coding: green (valid), red (invalid), yellow (pending)
-   - [X] Created reusable status utility functions for consistency
-   - [X] Applied same status logic to both group list and activity details screens
-
-6. **Navigation Flow Fixes** ✅
-   - [X] **Fixed infinite redirect loop between voting and details**
-   - [X] **Implemented new navigation flow as requested**
-   - [X] Click pending activity → Vote that specific activity
-   - [X] After voting → Redirect to details of that activity
-   - [X] Support for voting specific activity via activityId parameter
-   - [X] Maintained original flow for voting multiple activities
-   - [X] **Removed info button from voting screen**
-   - [X] User now must vote to see activity details
-   - [X] **Improved voting button UI**
-   - [X] Buttons with light backgrounds and colored borders
-   - [X] Green icons for "Válido" and red icons for "Migué"
-   - [X] Selected state with orange background and white text
-   - [X] **Improved activity details screen navigation**
-   - [X] Configured native back button in header
-   - [X] Back button redirects to group page
-   - [X] Header with "Detalhes da Atividade" title and "Grupo" as back text
-   - [X] **Improved navigation history manipulation after voting**
-   - [X] After voting, history is manipulated to go back directly to group
-   - [X] Uses router.replace to replace voting route with group route
-   - [X] Native back button now works correctly after voting
-   - [X] **Improved group screen interface**
-   - [X] Removed members section from main group screen
-   - [X] Cleaner interface focused on main actions (post, vote)
-   - [X] Members now displayed only in settings screen
-   - [X] Faster loading and fewer visual distractions
-   - [X] **Improved navigation for own activities**
-   - [X] User not redirected to voting when clicking their own pending activity
-   - [X] Can see details of their own activities even when pending
-   - [X] Redirect to voting only for other users' activities
+   - [X] Tradução de categorias de desculpa e status em todas as telas
+   - [X] Ajuste de exibição de datas e nomes de devedor/credor
+2. **Balance System Improvements** ✅
+   - [X] Removida qualquer lógica de inserção manual de saldos no frontend
+   - [X] Corrigida duplicidade de registros em `balances`
+   - [X] Garantido que apenas o backend consolida saldos
+   - [X] Ajustada exibição de ciclos e status visual
 
 ### Phase 9: Testing and Optimization 🔄 IN PROGRESS
 1. **Testing**

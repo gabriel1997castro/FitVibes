@@ -147,14 +147,29 @@ FitVibes é um aplicativo social e gamificado para incentivar grupos de pessoas 
 
 ### **9. Tela de Saldos/Pagamentos**
 
-* Lista de quanto cada um deve a quem
-* Saldo por ciclo (semanal ou mensal)
-* Botão: **"Marcar pagamento como feito"** (controle apenas, sem transação real)
+* Lista de quanto cada um deve a quem, consolidado por ciclo (semanal ou mensal, conforme configuração do grupo)
+* Saldos são calculados e consolidados automaticamente pelo backend, por par de usuários e por ciclo
+* Botão: **"Marcar pagamento como feito"** (controle simbólico, sem transação real)
+* Exibição de status visual: 💰 (você deve), ⏳ (aguardando pagamento), ✔️ (pago)
+* Saldos quitados recentemente aparecem em seção separada
 * Notificação de fechamento de ciclo
 
 ---
 
-### **10. Telas Complementares**
+### **10. Tela de Histórico de Penalidades**
+
+* Lista cronológica de penalidades detalhadas:
+  * Data
+  * Grupo
+  * Devedor → Credor
+  * Motivo (tipo de penalidade: desculpa inválida, não postou, etc.)
+  * Valor
+* Filtro por grupo ou ciclo
+* Contador de valor total acumulado em penalidades
+
+---
+
+### **11. Telas Complementares**
 
 * **Notificações push**
 
@@ -312,6 +327,31 @@ CREATE TABLE notifications (
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+```
+
+### Tabela: `payment_history` — registro detalhado de penalidades
+```sql
+id UUID PRIMARY KEY
+ group_id UUID
+ post_id UUID
+ from_user_id UUID
+ to_user_id UUID
+ reason TEXT  -- exemplo: 'desculpa inválida', 'não postou'
+ amount NUMERIC
+ created_at TIMESTAMP DEFAULT now()
+```
+
+### Tabela: `balances`/`payments` — consolidação de saldos por ciclo
+```sql
+id UUID PRIMARY KEY
+ group_id UUID
+ from_user_id UUID
+ to_user_id UUID
+ amount NUMERIC
+ cycle_start DATE
+ cycle_end DATE
+ status TEXT CHECK (status IN ('pending', 'paid'))
+ created_at TIMESTAMP DEFAULT now()
 ```
 
 ---

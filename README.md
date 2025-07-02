@@ -196,3 +196,63 @@ Deploy on all platforms with Expo Application Services (EAS).
 ## 📝 Notes
 
 - [Expo Router: Docs](https://docs.expo.dev/router/introduction/)
+
+## 🚦 Como funciona o sistema de penalidades e saldos
+
+- **Ciclos de pagamento**: Cada grupo define se o ciclo é semanal (fecha toda segunda) ou mensal (fecha todo dia 1).
+- **Penalidades**: Ao perder uma votação (atividade inválida ou desculpa rejeitada), o usuário "deve" um valor simbólico, dividido entre os demais membros ativos do grupo.
+- **Consolidação de saldos**: O backend consolida automaticamente os saldos por ciclo e por par de usuários, sem intervenção do frontend.
+- **Histórico detalhado**: Cada penalidade é registrada com grupo, data, devedor, credor, motivo e valor.
+- **Pagamento simbólico**: Não há transação real; o app permite marcar como pago manualmente.
+- **Notificações**: Push ao fechar ciclo, informando os saldos.
+
+## 🗄️ Modelagem de Dados
+
+### Tabela: `payment_history`
+| Campo         | Tipo     | Descrição                                 |
+|---------------|----------|-------------------------------------------|
+| id            | UUID     | Identificador único                       |
+| group_id      | UUID     | Grupo onde ocorreu                        |
+| post_id       | UUID     | Post/atividade relacionada                |
+| from_user_id  | UUID     | Devedor                                   |
+| to_user_id    | UUID     | Credor                                    |
+| reason        | TEXT     | Motivo da penalidade                      |
+| amount        | NUMERIC  | Valor atribuído                           |
+| created_at    | TIMESTAMP| Data/hora da penalidade                   |
+
+### Tabela: `balances`/`payments`
+| Campo         | Tipo     | Descrição                                 |
+|---------------|----------|-------------------------------------------|
+| id            | UUID     | Identificador único                       |
+| group_id      | UUID     | Grupo                                     |
+| from_user_id  | UUID     | Devedor                                   |
+| to_user_id    | UUID     | Credor                                    |
+| amount        | NUMERIC  | Valor total do ciclo                      |
+| cycle_start   | DATE     | Início do ciclo                           |
+| cycle_end     | DATE     | Fim do ciclo                              |
+| status        | TEXT     | 'pending' ou 'paid'                       |
+| created_at    | TIMESTAMP| Data/hora de criação                      |
+
+## 🖥️ UX
+
+### Aba: Saldos
+- Header com intervalo do ciclo atual (ex: "Ciclo: 1–7 de julho")
+- Lista de dívidas por par (quem deve para quem, valor)
+- Botão "Marcar como pago" para cada relação
+- Status visual: 💰 (devedor), ⏳ (aguardando), ✔️ (pago)
+- Saldos quitados recentemente aparecem em seção separada
+
+### Aba: Histórico
+- Lista detalhada de penalidades (data, grupo, devedor, credor, motivo, valor)
+- Filtro por grupo ou ciclo
+- Contador de valor total acumulado em penalidades
+
+## 🔒 Segurança
+- Permissões RLS garantem que apenas usuários autenticados consultem seus próprios saldos e histórico.
+- Toda consolidação de saldo é feita exclusivamente pelo backend.
+
+## 📲 Notificações
+- Push ao fechar ciclo, informando os saldos e incentivando a regularização.
+
+---
+Para detalhes técnicos completos, consulte `docs/Context.MD` e `docs/DevelopmentPlan.md`.
