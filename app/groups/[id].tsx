@@ -157,12 +157,14 @@ export default function GroupDetailsScreen() {
           >
             <Text style={styles.balanceButtonText}>Ver Saldos</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={() => router.push(`/groups/${id}/settings`)}
-          >
-            <Text style={styles.settingsButtonText}>⚙️</Text>
-          </TouchableOpacity>
+          {isAdmin && (
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => router.push(`/groups/${id}/settings`)}
+            >
+              <Text style={styles.settingsButtonText}>⚙️</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

@@ -14,7 +14,7 @@ export default function Index() {
       
       if (session) {
         // User is signed in, redirect to home
-        router.replace('/home');
+        router.replace('/groups');
       } else {
         // No user is signed in, redirect to login
         router.replace('/login');

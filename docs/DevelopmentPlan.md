@@ -21,7 +21,7 @@ This document outlines the step-by-step development plan for the FitVibes app, i
 3. **Authentication System** ✅
    - [X] Implement user registration
    - [X] Implement login with email/password
-   - [ ] Add social login (Google, Apple)
+   - [X] Add social login (Google, Apple)
    - [X] Set up JWT authentication
    - [X] Create protected routes
 
@@ -219,298 +219,47 @@ This document outlines the step-by-step development plan for the FitVibes app, i
    - [ ] Optimize image loading
    - [ ] Implement lazy loading
 
-### Phase 10: Deployment and Launch 📋 PLANNED
-1. **Deployment**
-   - [ ] Set up production environment
-   - [ ] Configure CI/CD pipeline
-   - [ ] Set up monitoring
-   - [ ] Configure backups
-   - [ ] Set up SSL certificates
+### Phase 9.5: Activities Feed Feature 📋 PLANNED
+1. **Database Implementation**
+   - [ ] Create `user_feed_activities` view for efficient querying
+   - [ ] Add indexes for feed performance optimization
+   - [ ] Implement cursor-based pagination for infinite scroll
+   - [ ] Create RLS policies for feed data access
+   - [ ] Add activity reaction system (likes/reactions)
 
-2. **Launch Preparation**
-   - [ ] Create app store listings
-   - [ ] Prepare marketing materials
-   - [ ] Set up analytics
-   - [ ] Create user documentation
-   - [ ] Plan launch strategy
+2. **Backend Services**
+   - [ ] Create `activitiesFeedService.ts` for feed API calls
+   - [ ] Implement pagination logic with cursor-based approach
+   - [ ] Add filtering by group functionality
+   - [ ] Create reaction/quick vote system
+   - [ ] Implement real-time updates for new activities
 
-### Phase 11: Post-Launch (Ongoing)
-1. **Monitoring and Maintenance**
-   - [ ] Monitor app performance
-   - [ ] Track user feedback
-   - [ ] Fix reported bugs
-   - [ ] Implement improvements
-   - [ ] Update documentation
+3. **Frontend Components**
+   - [ ] Design and implement `ActivityCard` component
+   - [ ] Create activities feed screen with FlatList
+   - [ ] Add infinite scroll and pull-to-refresh
+   - [ ] Implement reaction buttons with animations
+   - [ ] Add group filter modal
 
-2. **Feature Expansion**
-   - [ ] Plan new features
-   - [ ] Implement user requests
-   - [ ] Add premium features
-   - [ ] Expand social features
-   - [ ] Add new gamification elements
+4. **UI/UX Design**
+   - [ ] Design activity card layout with social media feel
+   - [ ] Create smooth animations for reactions
+   - [ ] Implement skeleton loading for cards
+   - [ ] Add empty state for no activities
+   - [ ] Design group filter interface
+   - [ ] Create reaction button animations
 
-## 📊 Current Project Status
+5. **Performance Optimization**
+   - [ ] Implement virtual scrolling for large lists
+   - [ ] Add image caching for user avatars
+   - [ ] Optimize re-renders with React.memo
+   - [ ] Implement debounced search/filter
+   - [ ] Add offline support for cached activities
 
-### ✅ Completed Features
-- **Authentication System**: Complete with email/password and social login
-- **Group Management**: Full CRUD operations, member management, invites
-- **Activity System**: Posting, multi-group support, exercise types, excuses
-- **Voting System**: Complete voting mechanism with comments
-- **Balance System**: Payment tracking, cycles, notifications
-- **Achievement System**: Global/group streaks, variety, social achievements
-- **Profile System**: Comprehensive stats, achievements, rankings
-- **Database**: Complete schema with triggers, functions, and RLS policies
-- **Localization**: Portuguese translations for exercise types and excuse categories
-- **Activity Details**: Complete activity details screen with voting results
-- **Smart Navigation**: Intelligent navigation flow for voting and details
-- **UI Improvements**: Enhanced voting buttons, clean group interface
+6. **Advanced Features**
+   - [ ] Add activity search functionality
+   - [ ] Implement activity sharing (deep links)
+   - [ ] Create activity statistics (most active users, popular times)
+   - [ ] Add activity highlights for achievements
+   - [ ] Implement activity notifications for feed updates
 
-### 🔄 In Progress
-- **Testing**: Unit and integration tests
-- **Performance Optimization**: Query optimization and caching
-- **UI Polish**: Final design refinements
-
-### 📋 Planned Features
-- **Advanced Analytics**: Detailed user insights
-- **Social Features**: Chat, sharing, enhanced notifications
-- **Premium Features**: Advanced statistics, unlimited groups
-- **Mobile App Stores**: iOS and Android deployment
-
-## 🏗️ Technical Architecture
-
-### Frontend Stack
-- **Framework**: React Native with Expo
-- **Navigation**: Expo Router with file-based routing
-- **State Management**: Zustand
-- **UI Components**: Custom components with MaterialCommunityIcons
-- **Styling**: StyleSheet with consistent design system
-
-### Backend Stack
-- **Database**: PostgreSQL with Supabase
-- **Authentication**: Supabase Auth with social providers
-- **Real-time**: Supabase real-time subscriptions
-- **Storage**: Supabase Storage for media
-- **Functions**: PostgreSQL functions for complex operations
-
-### Key Technical Achievements
-- **Multi-group posting**: Users can post activities to multiple groups simultaneously
-- **Dual streak system**: Global streak (across all groups) + group-specific streaks
-- **Real-time updates**: Live data synchronization across all screens
-- **Optimized queries**: Efficient SQL functions for complex data aggregation
-- **Secure architecture**: Comprehensive RLS policies and input validation
-- **Notification system**: Complete achievement and balance notifications with proper authentication
-- **Localization system**: Portuguese translations for all exercise types and excuse categories
-- **Smart navigation**: Intelligent routing based on activity status and user ownership
-
-### Critical Issues Resolved
-- **Supabase Client Duplication**: Fixed authentication issues caused by multiple Supabase client instances
-- **RLS Policy Conflicts**: Resolved permission denied errors for notifications table
-- **Achievement Notifications**: Implemented automatic notification creation for achievements via database triggers
-- **Authentication Context**: Ensured consistent authentication state across all app components
-- **Translation System**: Created comprehensive translation utilities for exercise types and excuse categories
-- **Navigation Flow**: Fixed infinite redirect loops and implemented smart navigation logic
-- **UI Consistency**: Standardized status displays and voting interface across all screens
-
-## 📋 Development Guidelines
-
-### Code Standards
-- [X] Follow TypeScript best practices
-- [X] Use functional components with hooks
-- [X] Implement proper error handling
-- [X] Write comprehensive documentation
-- [X] Follow Git flow branching strategy
-
-### Testing Requirements
-- [ ] Maintain 80% code coverage
-- [ ] Write tests for all new features
-- [ ] Perform regular security audits
-- [ ] Conduct performance testing
-- [ ] Test on multiple devices
-
-### Documentation
-- [X] Keep README updated
-- [X] Document all API endpoints
-- [X] Maintain changelog
-- [X] Create user guides
-- [X] Document deployment process
-
-### Performance Targets
-- [X] App launch < 2 seconds
-- [X] Screen transitions < 300ms
-- [X] API response time < 200ms
-- [ ] Offline functionality
-- [ ] Battery usage optimization
-
-## 📊 Progress Tracking
-
-### Completion Status
-- [X] Phase 1: Project Setup and Authentication (100%)
-- [X] Phase 2: Core Features - Groups (100%)
-- [X] Phase 3: Activities and Posts (100%)
-- [X] Phase 4: Voting System (100%)
-- [X] Phase 5: Balance and Payments (100%)
-- [X] Phase 6: Gamification and Achievements (100%)
-- [X] Phase 7: Profile and Statistics (100%)
-- [X] Phase 8: Advanced Features (100%)
-- [X] Phase 8.5: Bug Fixes and UI Improvements (100%)
-- 🔄 Phase 9: Testing and Optimization (20%)
-- 📋 Phase 10: Deployment and Launch (0%)
-- 📋 Phase 11: Post-Launch (0%)
-
-### Quality Metrics
-- **Code Quality**: High - TypeScript, proper error handling, clean architecture
-- **Performance**: Good - Optimized queries, efficient UI updates
-- **Security**: High - RLS policies, input validation, secure authentication
-- **User Experience**: Excellent - Intuitive UI, smooth navigation, real-time updates
-- **Localization**: Complete - Portuguese translations for all user-facing content
-
-### Timeline Adherence
-- **Original Timeline**: 8 weeks for MVP
-- **Current Status**: Core MVP completed in ~6 weeks
-- **Additional Features**: Multi-group support, advanced achievements, comprehensive profile, localization
-- **Next Milestone**: Testing and optimization phase
-
-## 🔄 Daily Development Workflow
-
-1. **Morning Standup**
-   - Review previous day's progress
-   - Set goals for the day
-   - Address blockers
-
-2. **Development**
-   - Follow Git flow branching strategy
-   - Write tests before implementation
-   - Regular commits with clear messages
-   - Code review process
-
-3. **End of Day**
-   - Update progress tracking
-   - Document any issues
-   - Plan next day's tasks
-
-## 🎯 Success Criteria
-
-The project will be considered successful when:
-
-1. **Technical Requirements** ✅
-   - [X] All features implemented as specified
-   - [X] Performance targets met
-   - [X] Security requirements satisfied
-   - [X] Code quality standards maintained
-
-2. **User Experience** ✅
-   - [X] Intuitive and engaging interface
-   - [X] Smooth performance
-   - [X] Positive user feedback
-   - [X] High user retention
-
-3. **Business Goals** 📋
-   - [ ] Successful app store launch
-   - [ ] Growing user base
-   - [ ] Positive user engagement
-   - [ ] Meeting gamification objectives
-
-## 🚀 Next Steps
-
-### Immediate Priorities (Next 2 weeks)
-1. **Complete Testing Phase**
-   - Write comprehensive unit tests
-   - Implement integration tests
-   - Perform security audit
-   - Conduct performance testing
-
-2. **UI/UX Polish**
-   - Final design refinements
-   - Animation optimizations
-   - Accessibility improvements
-   - Cross-platform testing
-
-3. **Deployment Preparation**
-   - Set up production environment
-   - Configure CI/CD pipeline
-   - Prepare app store assets
-   - Create deployment documentation
-
-### Medium-term Goals (Next 4 weeks)
-1. **App Store Launch**
-   - Submit to iOS App Store
-   - Submit to Google Play Store
-   - Set up analytics and monitoring
-   - Create marketing materials
-
-2. **User Feedback Integration**
-   - Collect user feedback
-   - Implement requested features
-   - Fix reported issues
-   - Optimize based on usage data
-
-### Long-term Vision (Next 6 months)
-1. **Feature Expansion**
-   - Advanced social features
-   - Premium subscription model
-   - Integration with fitness devices
-   - AI-powered insights
-
-2. **Scale and Growth**
-   - International expansion
-   - Enterprise features
-   - API for third-party integrations
-   - Community features
-
-## 🚀 Immediate Next Steps (Next 2-3 Days)
-
-### Priority 1: Testing and Quality Assurance
-1. **Manual Testing**
-   - [ ] Test all user flows end-to-end
-   - [ ] Verify multi-group posting functionality
-   - [ ] Test achievement system thoroughly
-   - [ ] Validate notification system
-   - [ ] Test translation system with various inputs
-
-2. **Edge Cases**
-   - [ ] Test with large groups (50+ members)
-   - [ ] Verify behavior with network issues
-   - [ ] Test with different device sizes
-   - [ ] Validate accessibility features
-
-### Priority 2: Performance Optimization
-1. **Database Queries**
-   - [ ] Review and optimize slow queries
-   - [ ] Add proper indexing for frequently accessed data
-   - [ ] Implement query result caching where appropriate
-
-2. **App Performance**
-   - [ ] Optimize image loading and caching
-   - [ ] Implement lazy loading for long lists
-   - [ ] Reduce bundle size and improve startup time
-
-### Priority 3: UI/UX Polish
-1. **Visual Polish**
-   - [ ] Review and improve loading states across all screens
-   - [ ] Add subtle animations for better user feedback
-   - [ ] Ensure consistent spacing and typography
-
-2. **Error Handling**
-   - [ ] Improve error messages for better user understanding
-   - [ ] Add retry mechanisms for failed operations
-   - [ ] Implement offline state handling
-
-## 🎯 Success Criteria for Next Phase
-
-### Technical Goals
-- [ ] Zero critical bugs in production
-- [ ] App launch time < 2 seconds
-- [ ] Smooth 60fps animations
-- [ ] 99.9% uptime for backend services
-
-### User Experience Goals
-- [ ] Intuitive navigation for all user types
-- [ ] Clear feedback for all user actions
-- [ ] Consistent visual design throughout
-- [ ] Accessible to users with different needs
-
-### Business Goals
-- [ ] Ready for beta testing with real users
-- [ ] Complete feature set for MVP launch
-- [ ] Scalable architecture for growth
-- [ ] Comprehensive documentation for maintenance 

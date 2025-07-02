@@ -19,7 +19,6 @@ export default function JoinGroupScreen() {
   const { code } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
   const [inviteCode, setInviteCode] = useState(code as string || '');
-  const [email, setEmail] = useState('');
 
   const handleJoinWithCode = async () => {
     try {
@@ -88,110 +87,34 @@ export default function JoinGroupScreen() {
     }
   };
 
-  const handleJoinWithEmail = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
-
-      // Check if email exists in users table
-      const { data: invitedUser, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email)
-        .single();
-
-      if (userError || !invitedUser) {
-        throw new Error('Usuário não encontrado');
-      }
-
-      // Generate invite code
-      const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-      // Create invite
-      const { error: inviteError } = await supabase
-        .from('group_invites')
-        .insert({
-          invited_by: user.id,
-          invite_code: inviteCode,
-          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-        });
-
-      if (inviteError) throw inviteError;
-
-      Alert.alert(
-        'Convite Enviado',
-        'Um convite foi enviado para o email informado.',
-        [{ text: 'OK', onPress: () => router.back() }]
-      );
-    } catch (error) {
-      console.error('Error sending invite:', error);
-      Alert.alert('Erro', error instanceof Error ? error.message : 'Não foi possível enviar o convite');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.content}>
+      <View style={styles.contentCentered}>
+        <MaterialCommunityIcons name="account-group" size={64} color="#FF6B35" style={{ marginBottom: 16 }} />
         <Text style={styles.title}>Entrar em um Grupo</Text>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Usar Código de Convite</Text>
-          <TextInput
-            style={styles.input}
-            value={inviteCode}
-            onChangeText={setInviteCode}
-            placeholder="Digite o código de convite"
-            autoCapitalize="characters"
-            editable={!loading}
-          />
-          <TouchableOpacity
-            style={[styles.button, !inviteCode && styles.buttonDisabled]}
-            onPress={handleJoinWithCode}
-            disabled={!inviteCode || loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Entrar no Grupo</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.divider}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>ou</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Convidar por Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Digite o email do convidado"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            editable={!loading}
-          />
-          <TouchableOpacity
-            style={[styles.button, !email && styles.buttonDisabled]}
-            onPress={handleJoinWithEmail}
-            disabled={!email || loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Enviar Convite</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.subtitle}>Digite o código de convite para participar de um grupo com seus amigos!</Text>
+        <TextInput
+          style={styles.input}
+          value={inviteCode}
+          onChangeText={setInviteCode}
+          placeholder="Código de convite"
+          autoCapitalize="characters"
+          editable={!loading}
+        />
+        <TouchableOpacity
+          style={[styles.button, !inviteCode && styles.buttonDisabled]}
+          onPress={handleJoinWithCode}
+          disabled={!inviteCode || loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Entrar no Grupo</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -202,61 +125,50 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  content: {
+  contentCentered: {
     flex: 1,
-    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: 'bold',
     color: '#1F2937',
-    marginBottom: 24,
+    marginBottom: 8,
     textAlign: 'center',
   },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
+  subtitle: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#4B5563',
-    marginBottom: 12,
+    color: '#6B7280',
+    marginBottom: 24,
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    padding: 16,
+    fontSize: 18,
     color: '#1F2937',
-    marginBottom: 12,
+    width: '100%',
+    marginBottom: 16,
+    backgroundColor: '#F9FAFB',
   },
   button: {
     backgroundColor: '#FF6B35',
-    padding: 16,
+    paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
+    width: '100%',
+    marginBottom: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#FFD6C2',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E7EB',
-  },
-  dividerText: {
-    color: '#6B7280',
-    marginHorizontal: 12,
   },
 }); 
