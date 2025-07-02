@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ActivityFeedItem, ActivityReaction } from '../services/activitiesFeedService';
-import { translateExerciseType } from '../lib/exerciseTranslations';
+import { translateExerciseType, translateExcuseCategory } from '../lib/exerciseTranslations';
 
 interface ActivityCardProps {
   activity: ActivityFeedItem;
@@ -89,7 +89,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
         
         {activity.type === 'excuse' && (
           <Text style={styles.activityDetails}>
-            {activity.excuse_category} • {activity.excuse_text}
+            {translateExcuseCategory(activity.excuse_category)}{activity.excuse_text ? ` • ${activity.excuse_text}` : ''}
           </Text>
         )}
       </View>

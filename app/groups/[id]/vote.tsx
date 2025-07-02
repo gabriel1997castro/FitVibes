@@ -201,47 +201,6 @@ export default function VoteScreen() {
         }
 
         console.log('Activity status updated successfully');
-
-        // If activity is invalid, create a balance entry
-        if (validVotes <= votes.length / 2) {
-          // Get group penalty amount
-          const { data: groupData, error: groupError } = await supabase
-            .from('groups')
-            .select('penalty_amount')
-            .eq('id', id)
-            .single();
-
-          if (groupError) {
-            console.error('Error fetching group penalty amount:', groupError);
-            throw groupError;
-          }
-
-          // Get current cycle dates
-          const today = new Date();
-          const cycleStartDate = new Date(today);
-          cycleStartDate.setDate(1); // Start of current month
-          const cycleEndDate = new Date(today.getFullYear(), today.getMonth() + 1, 0); // End of current month
-
-          // Create balance entry
-          const { error: balanceError } = await supabase
-            .from('balances')
-            .insert({
-              group_id: id,
-              user_id: activities[currentIndex].user_id,
-              owed_to_user_id: user.id, // The voter who marked it as invalid
-              amount: groupData.penalty_amount,
-              cycle_start_date: cycleStartDate.toISOString().split('T')[0],
-              cycle_end_date: cycleEndDate.toISOString().split('T')[0],
-              status: 'pending'
-            });
-
-          if (balanceError) {
-            console.error('Error creating balance:', balanceError);
-            throw balanceError;
-          }
-
-          console.log('Balance created successfully');
-        }
       } else {
         console.log('Not enough votes to update status:', {
           votesCount: votes.length,

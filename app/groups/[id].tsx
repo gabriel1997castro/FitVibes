@@ -218,7 +218,7 @@ export default function GroupDetailsScreen() {
                     </Text>
                   )}
                   <Text style={styles.activityDate}>
-                    {new Date(activity.date).toLocaleDateString()}
+                    {activity.date ? activity.date.split('-').reverse().join('/') : ''}
                   </Text>
                   <View style={styles.activityFooter}>
                     <Text style={styles.tapToView}>Toque para ver detalhes</Text>
