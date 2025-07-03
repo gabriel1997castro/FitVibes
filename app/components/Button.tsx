@@ -12,6 +12,8 @@ export type ButtonProps = {
   style?: any;
   textStyle?: any;
   iconPosition?: 'left' | 'right';
+  variant?: 'solid' | 'link';
+  underline?: boolean;
 };
 
 const COLORS = {
@@ -21,6 +23,7 @@ const COLORS = {
   success: '#10B981',
   disabled: '#E5E7EB',
   text: '#fff',
+  link: '#FF6B35',
 };
 
 export default function Button({
@@ -33,27 +36,48 @@ export default function Button({
   style,
   textStyle,
   iconPosition = 'left',
+  variant = 'solid',
+  underline = false,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const backgroundColor = isDisabled ? COLORS.disabled : COLORS[color];
 
+  const buttonStyle = [
+    styles.button,
+    variant === 'solid' && { backgroundColor },
+    variant === 'link' && styles.linkButton,
+    style,
+    isDisabled && styles.disabled,
+  ];
+
+  const textColor =
+    variant === 'link'
+      ? COLORS.link
+      : COLORS.text;
+
+  const linkTextStyle = [
+    variant === 'link' && styles.linkText,
+    underline && { textDecorationLine: 'underline' },
+    !underline && { textDecorationLine: 'none' },
+  ];
+
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor }, style, isDisabled && styles.disabled]}
+      style={buttonStyle}
       onPress={onPress}
       activeOpacity={0.8}
       disabled={isDisabled}
     >
       {loading ? (
-        <ActivityIndicator color={COLORS.text} />
+        <ActivityIndicator color={textColor} />
       ) : (
         <View style={styles.contentRow}>
           {icon && iconPosition === 'left' && (
-            <MaterialCommunityIcons name={icon} size={20} color={COLORS.text} style={styles.icon} />
+            <MaterialCommunityIcons name={icon} size={20} color={textColor} style={styles.icon} />
           )}
-          <Text style={[styles.text, textStyle]}>{title}</Text>
+          <Text style={[styles.text, { color: textColor }, ...linkTextStyle, textStyle]}>{title}</Text>
           {icon && iconPosition === 'right' && (
-            <MaterialCommunityIcons name={icon} size={20} color={COLORS.text} style={styles.icon} />
+            <MaterialCommunityIcons name={icon} size={20} color={textColor} style={styles.icon} />
           )}
         </View>
       )}
@@ -71,10 +95,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     minHeight: 48,
   },
+  linkButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    minHeight: undefined,
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   text: {
     color: COLORS.text,
     fontSize: 16,
     fontWeight: '600',
+  },
+  linkText: {
+    color: COLORS.link,
+    fontSize: 16,
+    fontWeight: '500',
   },
   icon: {
     marginHorizontal: 6,
