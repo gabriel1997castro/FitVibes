@@ -56,12 +56,19 @@ export default function ActivityDetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [votes, setVotes] = useState<Vote[]>([]);
+  const [totalVoters, setTotalVoters] = useState<number | null>(null);
 
   useEffect(() => {
     if (activityId) {
       fetchActivityDetails();
     }
   }, [activityId]);
+
+  useEffect(() => {
+    if (activity && activity.group_id && activity.user_id) {
+      fetchTotalVoters();
+    }
+  }, [activity]);
 
   const fetchActivityDetails = async () => {
     try {
@@ -107,13 +114,30 @@ export default function ActivityDetailsScreen() {
 
       if (votesError) throw votesError;
       setVotes(votesData || []);
-      console.log('Votes loaded:', votesData);
-      console.log('Votes with comments:', votesData?.filter(vote => vote.comment_type));
     } catch (error) {
       console.error('Error fetching activity details:', error);
       Alert.alert('Erro', 'Não foi possível carregar os detalhes da atividade.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTotalVoters = async () => {
+    try {
+   
+      const { data: groupMembers, error } = await supabase
+        .from('group_members_visible')
+        .select('id, user_id')
+        .eq('group_id', activity.group_id)
+        .neq('user_id', activity.user_id); // Exclui o dono da atividade
+
+        console.log('activity.group_id:', activity.group_id);
+        console.log('groupMembers:', groupMembers, 'error:', error);
+      if (error) throw error;
+      console.log('Group members:', groupMembers);
+      setTotalVoters(groupMembers.length);
+    } catch (error) {
+      setTotalVoters(null);
     }
   };
 
@@ -237,7 +261,9 @@ export default function ActivityDetailsScreen() {
           </View>
           <View style={styles.voteCount}>
             <MaterialCommunityIcons name="account-group" size={24} color="#6B7280" />
-            <Text style={styles.voteCountText}>{totalVotes} total</Text>
+            <Text style={styles.voteCountText}>
+              {totalVoters !== null ? `${totalVoters} esperado${totalVoters === 1 ? '' : 's'}` : '...'}
+            </Text>
           </View>
         </View>
 
