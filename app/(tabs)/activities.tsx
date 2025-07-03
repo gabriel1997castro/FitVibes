@@ -14,6 +14,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { ActivityCard } from '../components/ActivityCard';
 import { ActivitiesFeedService, ActivityFeedItem } from '../services/activitiesFeedService';
 import { supabase } from '../services/supabase';
+import Button from '../components/Button';
 
 export default function ActivitiesScreen() {
   const [activities, setActivities] = useState<ActivityFeedItem[]>([]);
@@ -162,17 +163,13 @@ export default function ActivitiesScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Atividades</Text>
-        <TouchableOpacity
-          style={styles.filterButton}
+        <Button
+          title=""
           onPress={() => setShowGroupFilter(true)}
-        >
-          <MaterialCommunityIcons name="filter-variant" size={24} color="#666" />
-          {selectedGroup && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>1</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+          style={styles.filterButton}
+          icon="filter-variant"
+          variant="link"
+        />
       </View>
 
       <FlatList
