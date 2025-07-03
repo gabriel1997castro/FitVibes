@@ -149,7 +149,7 @@ export default function VoteScreen() {
 
       // Get total number of group members (excluding the activity owner)
       const { data: groupMembers, error: membersError } = await supabase
-        .from('group_members')
+        .from('group_members_visible')
         .select('id, user_id')
         .eq('group_id', id)
         .neq('user_id', activities[currentIndex].user_id); // Exclude the activity owner
@@ -179,35 +179,6 @@ export default function VoteScreen() {
       console.log('Group members (excluding owner):', groupMembers.length);
       console.log('Total votes:', votes.length);
       console.log('Votes:', votes);
-
-      // If all members have voted (except the activity owner), update activity status
-      if (votes.length === groupMembers.length) { // Subtract 1 to exclude the activity owner
-        // Count valid votes
-        const validVotes = votes.filter(vote => vote.is_valid).length;
-        console.log('Valid votes count:', validVotes);
-        console.log('Total votes count:', votes.length);
-
-        // Update activity status based on majority vote
-        const { error: updateError } = await supabase
-          .from('activities')
-          .update({
-            status: validVotes > votes.length / 2 ? 'valid' : 'invalid'
-          })
-          .eq('id', activities[currentIndex].id);
-
-        if (updateError) {
-          console.error('Error updating activity status:', updateError);
-          throw updateError;
-        }
-
-        console.log('Activity status updated successfully');
-      } else {
-        console.log('Not enough votes to update status:', {
-          votesCount: votes.length,
-          requiredVotes: groupMembers.length,
-          groupMembersCount: groupMembers.length
-        });
-      }
 
       // Reset state for next activity
       setSelectedVote(null);
