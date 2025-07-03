@@ -15,6 +15,7 @@ import {
 import { router } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import Button from '../components/Button';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState('');
@@ -165,15 +166,14 @@ export default function RegisterScreen() {
             secureTextEntry
           />
 
-          <TouchableOpacity
-            style={styles.registerButton}
+          <Button
+            title={'Criar conta'}
             onPress={handleRegister}
+            loading={loading}
             disabled={loading}
-          >
-            <Text style={styles.registerButtonText}>
-              {loading ? 'Criando conta...' : 'Criar conta'}
-            </Text>
-          </TouchableOpacity>
+            style={styles.registerButton}
+            textStyle={styles.registerButtonText}
+          />
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -190,20 +190,23 @@ export default function RegisterScreen() {
             <Text style={styles.socialButtonText}>Continuar com Google</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.socialButton}
             onPress={handleAppleSignUp}
             disabled={loading}
           >
             <FontAwesome name="apple" size={24} color="#000" />
             <Text style={styles.socialButtonText}>Continuar com Apple</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Já tem uma conta? </Text>
-            <TouchableOpacity onPress={() => router.replace('/login')}>
-              <Text style={styles.loginLink}>Entrar</Text>
-            </TouchableOpacity>
+            <Button
+              title="Entrar"
+              onPress={() => router.replace('/login')}
+              variant="link"
+              textStyle={styles.loginLink}
+            />
           </View>
         </View>
       </ScrollView>

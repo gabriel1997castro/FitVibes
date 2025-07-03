@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Modal, Platform, Linking } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert} from 'react-native';
 import { supabase } from '../services/supabase';
 import { useRouter } from 'expo-router';
 import { GoogleSignin, GoogleSigninButton, isSuccessResponse, User } from '@react-native-google-signin/google-signin';
@@ -12,16 +12,9 @@ GoogleSignin.configure({
 })
 
 export default function LoginScreen() {
-  // const [auth, setAuth] = useState<User | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false);
-  const [signUpEmail, setSignUpEmail] = useState('');
-  const [signUpPassword, setSignUpPassword] = useState('');
-  const [signUpName, setSignUpName] = useState('');
-  const [signingUp, setSigningUp] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -40,24 +33,6 @@ export default function LoginScreen() {
     }
   };
 
-  const handleSignUp = async () => {
-    setSigningUp(true);
-    const { error } = await supabase.auth.signUp({
-      email: signUpEmail,
-      password: signUpPassword,
-      options: { data: { name: signUpName } },
-    });
-    setSigningUp(false);
-    if (error) {
-      Alert.alert('Erro ao criar conta', error.message);
-    } else {
-      setShowSignUp(false);
-      setSignUpEmail('');
-      setSignUpPassword('');
-      setSignUpName('');
-      Alert.alert('Sucesso', 'Conta criada! Verifique seu e-mail para confirmar.');
-    }
-  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -80,19 +55,19 @@ export default function LoginScreen() {
     }
   };
 
-  const handleAppleLogin = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-      });
-      if (error) throw error;
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleAppleLogin = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const { error } = await supabase.auth.signInWithOAuth({
+  //       provider: 'apple',
+  //     });
+  //     if (error) throw error;
+  //   } catch (error) {
+  //     Alert.alert('Erro', error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -118,7 +93,7 @@ export default function LoginScreen() {
           />
 
           <Button
-            title={loading ? 'Entrando...' : 'Entrar'}
+            title={'Entrar'}
             onPress={handleLogin}
             loading={loading}
             disabled={loading}
@@ -133,14 +108,6 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-         {/*} <TouchableOpacity
-            style={styles.socialButton}
-            onPress={handleGoogleLogin}
-            disabled={loading}
-          >
-            <Text style={styles.socialButtonText}>Continuar com Google</Text>
-          </TouchableOpacity>*/}
-
           <GoogleSigninButton
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Light}
@@ -148,13 +115,13 @@ export default function LoginScreen() {
             disabled={loading}
           />
 
-          <Button
+          {/* <Button
           title='Continuar com Apple'
             style={styles.socialButton}
             onPress={handleAppleLogin}
             disabled={loading}
             textStyle={styles.socialButtonText}
-           />
+           /> */}
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Não tem uma conta? </Text>
