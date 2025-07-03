@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '../components/Button';
 
 const EMOJI_OPTIONS = ['🏋️‍♂️', '🏃‍♂️', '🚴‍♂️', '🏊‍♂️', '🧘‍♂️', '⚽', '🏀', '🎯', '💪', '🔥'];
 
@@ -183,20 +184,15 @@ export default function CreateGroupScreen() {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={[styles.createButton, loading && styles.disabledButton]}
+        <Button
+          title="Criar Grupo"
           onPress={handleCreateGroup}
+          loading={loading}
           disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <>
-              <MaterialCommunityIcons name="plus-circle" size={24} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.createButtonText}>Criar Grupo</Text>
-            </>
-          )}
-        </TouchableOpacity>
+          style={styles.createButton}
+          textStyle={styles.createButtonText}
+          icon="plus-circle"
+        />
       </View>
     </ScrollView>
   );
