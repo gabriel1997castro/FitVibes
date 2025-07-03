@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Scr
 import { useLocalSearchParams } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '../../components/Button';
 
 // Importar o conteúdo da tela de histórico
 import GroupHistoryScreen from './history';
@@ -194,17 +195,14 @@ export default function BalanceScreen() {
                 <MaterialCommunityIcons name="clock-outline" size={18} color="#D97706" style={{ marginRight: 4 }} />
                 <Text style={styles.statusPendente}>Aguardando pagamento</Text>
               </View>
-              <TouchableOpacity
-                style={styles.markAsPaidButton}
+              <Button
+                title="Marcar como Pago"
                 onPress={() => confirmMarkAsPaid(item.id)}
+                loading={updatingBalance === item.id}
                 disabled={updatingBalance === item.id}
-              >
-                {updatingBalance === item.id ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.markAsPaidButtonText}>Marcar como Pago</Text>
-                )}
-              </TouchableOpacity>
+                style={styles.markAsPaidButton}
+                textStyle={styles.markAsPaidButtonText}
+              />
             </View>
           ))}
           {/* Saldos quitados recentemente */}
