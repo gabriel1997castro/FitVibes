@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '../components/Button';
 
 type Group = {
   id: string;
@@ -93,20 +94,22 @@ export default function GroupListScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Meus Grupos</Text>
         <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.headerButton}
+          <Button
+            title="Entrar"
             onPress={() => router.push('/join')}
-          >
-            <MaterialCommunityIcons name="account-plus" size={24} color="#FF6B35" />
-            <Text style={styles.headerButtonText}>Entrar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={styles.headerButton}
+            textStyle={styles.headerButtonText}
+            icon="account-plus"
+            variant="link"
+          />
+          <Button
+            title="Criar"
             onPress={() => router.push('/groups/create')}
-          >
-            <MaterialCommunityIcons name="plus" size={24} color="#FF6B35" />
-            <Text style={styles.headerButtonText}>Criar</Text>
-          </TouchableOpacity>
+            style={styles.headerButton}
+            textStyle={styles.headerButtonText}
+            icon="plus"
+            variant="link"
+          />
         </View>
       </View>
 
@@ -117,12 +120,12 @@ export default function GroupListScreen() {
           <Text style={styles.emptySubtext}>
             Crie um grupo para começar a treinar com seus amigos!
           </Text>
-          <TouchableOpacity
-            style={styles.emptyButton}
+          <Button
+            title="Criar Primeiro Grupo"
             onPress={() => router.push('/groups/create')}
-          >
-            <Text style={styles.emptyButtonText}>Criar Primeiro Grupo</Text>
-          </TouchableOpacity>
+            style={styles.emptyButton}
+            textStyle={styles.emptyButtonText}
+          />
         </View>
       ) : (
         <FlatList
