@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, Platform, Linking } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Modal, Platform, Linking } from 'react-native';
 import { supabase } from '../services/supabase';
 import { useRouter } from 'expo-router';
 import { GoogleSignin, GoogleSigninButton, isSuccessResponse, User } from '@react-native-google-signin/google-signin';
+import Button from '../components/Button';
 
 GoogleSignin.configure({
   scopes: ['https://www.googleapis.com/auth/drive'],
@@ -116,15 +117,15 @@ export default function LoginScreen() {
             secureTextEntry
           />
 
-          <TouchableOpacity
-            style={styles.loginButton}
+          <Button
+            title={loading ? 'Entrando...' : 'Entrar'}
             onPress={handleLogin}
+            loading={loading}
             disabled={loading}
-          >
-            <Text style={styles.loginButtonText}>
-              {loading ? 'Entrando...' : 'Entrar'}
-            </Text>
-          </TouchableOpacity>
+            style={styles.loginButton}
+            textStyle={styles.loginButtonText}
+
+          />
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
@@ -142,18 +143,18 @@ export default function LoginScreen() {
 
           <GoogleSigninButton
             size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
+            color={GoogleSigninButton.Color.Light}
             onPress={handleGoogleLogin}
             disabled={loading}
           />
 
-          <TouchableOpacity
+          <Button
+          title='Continuar com Apple'
             style={styles.socialButton}
             onPress={handleAppleLogin}
             disabled={loading}
-          >
-            <Text style={styles.socialButtonText}>Continuar com Apple</Text>
-          </TouchableOpacity>
+            textStyle={styles.socialButtonText}
+           />
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Não tem uma conta? </Text>
