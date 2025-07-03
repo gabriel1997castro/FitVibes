@@ -93,12 +93,6 @@ export default function ActivityDetailsScreen() {
       if (activityError) throw activityError;
       setActivity(activityData);
 
-      // If activity is pending and NOT owned by current user, redirect to voting
-      if (activityData.status === 'pending' && activityData.user_id !== user.id) {
-        router.replace(`/groups/${activityData.group_id}/vote?activityId=${activityId}`);
-        return;
-      }
-
       // Fetch votes for this activity (even if pending)
       const { data: votesData, error: votesError } = await supabase
         .from('votes')
@@ -114,6 +108,16 @@ export default function ActivityDetailsScreen() {
 
       if (votesError) throw votesError;
       setVotes(votesData || []);
+
+      // Só redireciona para votação se:
+      // - status pendente
+      // - usuário não é dono
+      // - usuário ainda NÃO votou
+      const alreadyVoted = (votesData || []).some(v => v.voter_id === user.id);
+      if (activityData.status === 'pending' && activityData.user_id !== user.id && !alreadyVoted) {
+        router.replace(`/groups/${activityData.group_id}/vote?activityId=${activityId}`);
+        return;
+      }
     } catch (error) {
       console.error('Error fetching activity details:', error);
       Alert.alert('Erro', 'Não foi possível carregar os detalhes da atividade.');
