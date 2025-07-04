@@ -13,6 +13,7 @@ import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { supabase } from '../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { translateExerciseType, translateExcuseCategory } from '../lib/exerciseTranslations';
+import Button from '../components/Button';
 
 type Group = {
   id: string;
@@ -151,19 +152,22 @@ export default function GroupDetailsScreen() {
       <View style={styles.headerContainer}>
         <Text style={styles.groupName}>{group?.name}</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={styles.balanceButton}
+          <Button
+            title="Saldos"
             onPress={() => router.push(`/groups/${id}/balance`)}
-          >
-            <Text style={styles.balanceButtonText}>Ver Saldos</Text>
-          </TouchableOpacity>
+            style={styles.balanceButton}
+            textStyle={styles.balanceButtonText}
+            icon="cash"
+          />
           {isAdmin && (
-            <TouchableOpacity
-              style={styles.settingsButton}
+            <Button
+              title=""
               onPress={() => router.push(`/groups/${id}/settings`)}
-            >
-              <Text style={styles.settingsButtonText}>⚙️</Text>
-            </TouchableOpacity>
+              style={styles.settingsButton}
+              textStyle={styles.settingsButtonText}
+              icon="cog"
+              variant="link"
+            />
           )}
         </View>
       </View>
@@ -176,12 +180,19 @@ export default function GroupDetailsScreen() {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Atividades</Text>
                 <View style={styles.sectionActions}>
-                  <TouchableOpacity
-                    style={styles.voteButton}
+                  <Button
+                    title="Votar"
                     onPress={() => router.push(`/groups/${id}/vote`)}
-                  >
-                    <Text style={styles.voteButtonText}>Votar</Text>
-                  </TouchableOpacity>
+                    style={styles.voteButton}
+                    textStyle={styles.voteButtonText}
+                  />
+                  <Button
+                    title="Adicionar"
+                    onPress={() => router.push(`/groups/${id}/post`)}
+                    style={styles.voteButton}
+                    textStyle={styles.voteButtonText}
+                    icon="plus"
+                  />
                 </View>
               </View>
               {activities.map((activity) => (
@@ -228,16 +239,6 @@ export default function GroupDetailsScreen() {
               ))}
             </View>
           </>
-        )}
-        ListFooterComponent={() => (
-          <View style={styles.bottomContainer}>
-            <TouchableOpacity
-              style={styles.floatingButton}
-              onPress={() => router.push(`/groups/${id}/post`)}
-            >
-              <Text style={styles.floatingButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
         )}
       />
     </View>
