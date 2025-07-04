@@ -16,6 +16,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { checkAndAwardStreakAchievements, checkAndAwardVarietyAchievements, checkAndAwardImmediateAchievements, updateGlobalStreakOnPost } from '../../features/achievements';
+import Button from '../../components/Button';
 
 const EXERCISE_TYPES = [
   { id: 'walking', name: 'Caminhada', icon: 'walk' as const },
@@ -411,25 +412,15 @@ export default function PostActivityScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          style={[styles.postButton, loading && styles.disabledButton]}
+        <Button
+          title={'Postar'}
           onPress={handlePost}
+          loading={loading}
           disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <>
-              <MaterialCommunityIcons name="send" size={24} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.postButtonText}>
-                {selectedGroups.length > 1 
-                  ? `Enviar em ${selectedGroups.length} grupos` 
-                  : 'Enviar'
-                }
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+          style={styles.postButton}
+          textStyle={styles.postButtonText}
+          icon="send"
+        />
       </ScrollView>
 
       {/* Group Selection Modal */}
