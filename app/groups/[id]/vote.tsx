@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { translateExerciseType, translateExcuseCategory } from '../../lib/exerciseTranslations';
+import Button from '../../components/Button';
 
 const PREDEFINED_COMMENTS = [
   { id: 'good_job', text: 'Boa, continue assim! 💪' },
@@ -312,7 +313,6 @@ export default function VoteScreen() {
                 selectedVote === 'valid' && { color: '#fff' }
               ]}>Válido</Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={[
                 styles.voteButton,
@@ -361,18 +361,14 @@ export default function VoteScreen() {
         )}
 
         {/* Confirm Button */}
-        <TouchableOpacity
-          style={[
-            styles.confirmButton,
-            !canConfirm && styles.disabledConfirmButton
-          ]}
+        <Button
+          title={'Confirmar Voto'}
           onPress={handleConfirmVote}
+          style={[styles.confirmButton, !canConfirm && styles.disabledConfirmButton]}
+          textStyle={styles.confirmButtonText}
           disabled={!canConfirm || voting}
-        >
-          <Text style={styles.confirmButtonText}>
-            {voting ? 'Enviando...' : 'Confirmar Voto'}
-          </Text>
-        </TouchableOpacity>
+          loading={voting}
+        />
       </View>
     </ScrollView>
   );
