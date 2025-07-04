@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from './services/supabase';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import Button from './components/Button';
 
 type Notification = {
   id: string;
@@ -168,9 +169,12 @@ export default function NotificationsScreen() {
         <Text style={styles.errorText}>Erro ao carregar notificações</Text>
         <Text style={styles.errorDetails}>{error}</Text>
         <Text style={styles.authStatus}>{authStatus}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={fetchNotifications}>
-          <Text style={styles.retryButtonText}>Tentar novamente</Text>
-        </TouchableOpacity>
+        <Button
+          title="Tentar novamente"
+          onPress={fetchNotifications}
+          style={styles.retryButton}
+          textStyle={styles.retryButtonText}
+        />
       </View>
     );
   }
