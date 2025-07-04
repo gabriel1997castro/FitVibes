@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '../../components/Button';
 
 type Group = {
   id: string;
@@ -302,29 +303,26 @@ export default function GroupSettingsScreen() {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.saveButton}
+        <Button
+          title="Salvar Configurações"
           onPress={handleSaveSettings}
+          loading={saving}
           disabled={saving}
-        >
-          {saving ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.saveButtonText}>Salvar Configurações</Text>
-          )}
-        </TouchableOpacity>
+          style={styles.saveButton}
+          textStyle={styles.saveButtonText}
+        />
       </View>
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Membros</Text>
-          <TouchableOpacity
-            style={styles.inviteButton}
+          <Button
+            title="Convidar"
             onPress={handleGenerateInvite}
-          >
-            <MaterialCommunityIcons name="account-plus" size={20} color="#fff" />
-            <Text style={styles.inviteButtonText}>Convidar</Text>
-          </TouchableOpacity>
+            style={[styles.inviteButton, { paddingVertical: 6, paddingHorizontal: 12, minHeight: undefined, height: 36 }]}
+            textStyle={styles.inviteButtonText}
+            icon="account-plus"
+          />
         </View>
 
         {members.map((member) => (
