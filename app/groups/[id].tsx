@@ -160,14 +160,12 @@ export default function GroupDetailsScreen() {
             icon="cash"
           />
           {isAdmin && (
-            <Button
-              title=""
-              onPress={() => router.push(`/groups/${id}/settings`)}
+            <TouchableOpacity
               style={styles.settingsButton}
-              textStyle={styles.settingsButtonText}
-              icon="cog"
-              variant="link"
-            />
+              onPress={() => router.push(`/groups/${id}/settings`)}
+            >
+              <Text style={styles.settingsButtonText}>⚙️</Text>
+            </TouchableOpacity>
           )}
         </View>
       </View>
