@@ -204,3 +204,19 @@ Este documento detalha o plano de desenvolvimento do FitVibes, incluindo as fase
    - [ ] Add activity highlights for achievements
    - [ ] Implement activity notifications for feed updates
 
+### Phase 10: Novo Ranking por Streak Days 🔄 PLANNED
+
+1. **Ranking Global de Streak**
+   - [X] Criar view/função SQL para retornar top usuários por streak global
+   - [X] Implementar endpoint/backend para buscar ranking global
+   - [X] Exibir lista dos top usuários na tela de ranking (sem pontuação, apenas streak)
+
+2. **Ranking de Streak por Grupo**
+   - [X] Buscar membros de cada grupo do usuário e ordenar por streak_days
+   - [X] Exibir ranking de streak para cada grupo do usuário na tela de ranking
+
+3. **Ajustes de UI/UX**
+   - [X] Ocultar pontuação nas listas de ranking
+   - [X] Adicionar títulos e seções para separar ranking global e por grupo
+   - [X] Garantir responsividade e visual consistente
+

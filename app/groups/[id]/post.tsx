@@ -190,6 +190,12 @@ export default function PostActivityScreen() {
       if (!user) throw new Error('Usuário não autenticado');
 
       // Use the new multi-group function
+      // Corrigir: enviar data local do usuário
+      const todayLocal = new Date();
+      const yyyy = todayLocal.getFullYear();
+      const mm = String(todayLocal.getMonth() + 1).padStart(2, '0');
+      const dd = String(todayLocal.getDate()).padStart(2, '0');
+      const localDate = `${yyyy}-${mm}-${dd}`;
       const { data, error } = await supabase.rpc('create_activity_for_multiple_groups', {
         p_user_id: user.id,
         p_groups: selectedGroups,
@@ -198,7 +204,7 @@ export default function PostActivityScreen() {
         p_duration_minutes: type === 'exercise' ? parseInt(duration) : null,
         p_excuse_category: type === 'excuse' ? selectedExcuse : null,
         p_excuse_text: type === 'excuse' ? excuseText : null,
-        p_date: new Date().toISOString().split('T')[0],
+        p_date: localDate, // data local do usuário
       });
 
       if (error) throw error;

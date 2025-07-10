@@ -348,9 +348,6 @@ export default function Profile() {
       {/* Exercise Distribution */}
       {renderExerciseDistribution()}
 
-      {/* Group Rankings */}
-      {renderGroupRankings()}
-
       {/* Bottom Spacing */}
       <View style={styles.bottomSpacing} />
     </ScrollView>
