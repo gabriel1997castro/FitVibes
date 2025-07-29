@@ -2,6 +2,24 @@
 
 FitVibes é um aplicativo social e gamificado para incentivar grupos de pessoas a manterem uma rotina de exercícios físicos através de pressão social positiva, desafios e recompensas simbólicas.
 
+## Images
+### IMPORTANT -> IT IS STILL IN PROGRESS. I STARTED JUN 17
+<div>
+    <img height="600" alt="IMG_9868" src="https://github.com/user-attachments/assets/dccd99d2-511e-4927-b9af-acf4e3601c14" />
+    <img height="600" alt="IMG_9869" src="https://github.com/user-attachments/assets/d016662a-91a7-4029-b9ce-51d74095d890" />
+    <img height="600" alt="IMG_9870" src="https://github.com/user-attachments/assets/f3d54a87-86ae-42b9-8c00-a79684e1ae39" />
+    <img height="600" alt="IMG_9871" src="https://github.com/user-attachments/assets/ab28d963-64db-4e0b-a0d6-8725568ee4ff" />
+    <img height="600" alt="IMG_9872" src="https://github.com/user-attachments/assets/3afd2804-9758-4214-9424-46e9182e379e" />
+    <img height="600" alt="IMG_9873" src="https://github.com/user-attachments/assets/e0a65363-9bb4-4fd9-ba90-f2ccba3b10da" />
+    <img height="600" alt="IMG_9874" src="https://github.com/user-attachments/assets/462c18a8-66d1-41f0-bc9b-408361e03c09" />
+    <img height="600" alt="IMG_9875" src="https://github.com/user-attachments/assets/075459a5-f0d0-49c1-b46a-2fbbb7063c2d" />
+    <img height="600" alt="IMG_9883" src="https://github.com/user-attachments/assets/e618d180-0170-4b3b-afb8-3242e45a0500" />
+    <img height="600" alt="IMG_9884" src="https://github.com/user-attachments/assets/4e94946f-1034-4be2-b022-3d5f0a731f62" />
+    <img height="600" alt="IMG_9885" src="https://github.com/user-attachments/assets/200ccc46-257b-47f0-8f32-60cbc037a15e" />
+
+</div>
+
+
 ## 🎯 Funcionalidades Principais
 
 - **Grupos de Exercício**: Crie e participe de grupos com amigos, família ou colegas
