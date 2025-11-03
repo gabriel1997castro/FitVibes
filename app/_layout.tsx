@@ -78,6 +78,42 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="join"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/post"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/vote"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/create"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/activity/[activityId]"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
         name="login"
         options={{
           headerShown: false,
