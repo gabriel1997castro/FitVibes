@@ -16,6 +16,7 @@
     },
     "android": {
       "package": "com.fitvibes.app"
-    }
+    },
+    "scheme": "com.fitvibes.app"
   }
 }
