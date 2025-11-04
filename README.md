@@ -7,15 +7,20 @@ FitVibes é um aplicativo social e gamificado para incentivar grupos de pessoas 
 <div>
     <img height="600" alt="IMG_9868" src="https://github.com/user-attachments/assets/dccd99d2-511e-4927-b9af-acf4e3601c14" />
     <img height="600" alt="IMG_9869" src="https://github.com/user-attachments/assets/d016662a-91a7-4029-b9ce-51d74095d890" />
-    <img height="600" alt="IMG_9870" src="https://github.com/user-attachments/assets/f3d54a87-86ae-42b9-8c00-a79684e1ae39" />
-    <img height="600" alt="IMG_9871" src="https://github.com/user-attachments/assets/ab28d963-64db-4e0b-a0d6-8725568ee4ff" />
-    <img height="600" alt="IMG_9872" src="https://github.com/user-attachments/assets/3afd2804-9758-4214-9424-46e9182e379e" />
-    <img height="600" alt="IMG_9873" src="https://github.com/user-attachments/assets/e0a65363-9bb4-4fd9-ba90-f2ccba3b10da" />
-    <img height="600" alt="IMG_9874" src="https://github.com/user-attachments/assets/462c18a8-66d1-41f0-bc9b-408361e03c09" />
-    <img height="600" alt="IMG_9875" src="https://github.com/user-attachments/assets/075459a5-f0d0-49c1-b46a-2fbbb7063c2d" />
-    <img height="600" alt="IMG_9883" src="https://github.com/user-attachments/assets/e618d180-0170-4b3b-afb8-3242e45a0500" />
-    <img height="600" alt="IMG_9884" src="https://github.com/user-attachments/assets/4e94946f-1034-4be2-b022-3d5f0a731f62" />
-    <img height="600" alt="IMG_9885" src="https://github.com/user-attachments/assets/200ccc46-257b-47f0-8f32-60cbc037a15e" />
+    <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 27 48" src="https://github.com/user-attachments/assets/3a37510e-da46-4966-83a9-b01a615d6521" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 27 29" src="https://github.com/user-attachments/assets/088ecd2b-764d-4730-8f41-d242216d8d17" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 28 15" src="https://github.com/user-attachments/assets/b90d8bcf-9749-4952-8cdb-40f71e2e0a9e" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 28 15" src="https://github.com/user-attachments/assets/e3703675-ef2d-4d54-a67b-93d2e678e086" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 28 32" src="https://github.com/user-attachments/assets/5d57e61d-8981-4262-af08-422a76cfad1a" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 29 44" src="https://github.com/user-attachments/assets/4bc1468c-e84a-452c-bb4c-decb0a5f06c1" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 32 45" src="https://github.com/user-attachments/assets/ea994a44-d15a-45a7-b771-2cc032d33b76" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 33 28" src="https://github.com/user-attachments/assets/4a7dcf77-b27a-49bd-94ff-9611db099cb8" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 33 48" src="https://github.com/user-attachments/assets/9e493ee7-c4b4-423d-ae5e-3cc74ff997e8" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 34 06" src="https://github.com/user-attachments/assets/2bcc2758-c83c-47f8-887c-33d77cb38dd0" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 36 28" src="https://github.com/user-attachments/assets/060bcb8b-ba4e-4e5d-a159-db0191eba02a" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 36 51" src="https://github.com/user-attachments/assets/0758b269-b257-4753-a71e-f137e9ecac51" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 37 06" src="https://github.com/user-attachments/assets/bba1defb-d00c-4805-8d64-13486214f591" />
+  <img height="600" alt="Simulator Screenshot - iPhone 17 Pro - 2025-11-04 at 11 37 15" src="https://github.com/user-attachments/assets/9d3c37ca-0193-4927-a7f2-64b66a2d46ff" />
 
 </div>
 
