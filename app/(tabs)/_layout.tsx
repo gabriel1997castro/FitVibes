@@ -1,6 +1,6 @@
-import { Tabs } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native';
+import { Tabs } from "expo-router";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -9,36 +9,45 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#ffffff',
+            backgroundColor: "#ffffff",
             height: 60,
             paddingBottom: 10,
             borderTopWidth: 1,
-            borderTopColor: '#e0e0e0',
+            borderTopColor: "#e0e0e0",
+            color: "#FF6B35",
           },
         }}
       >
         <Tabs.Screen
           name="groups"
           options={{
-            title: 'Grupos',
+            title: "Grupos",
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-group" size={size} color={color} />
+              <MaterialCommunityIcons
+                name="account-group"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
         <Tabs.Screen
           name="activities"
           options={{
-            title: 'Atividades',
+            title: "Atividades",
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="dumbbell" size={size} color={color} />
+              <MaterialCommunityIcons
+                name="dumbbell"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
         <Tabs.Screen
           name="ranking"
           options={{
-            title: 'Ranking',
+            title: "Ranking",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="trophy" size={size} color={color} />
             ),
@@ -47,7 +56,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="notifications"
           options={{
-            title: 'Notificações',
+            title: "Notificações",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="bell" size={size} color={color} />
             ),
@@ -56,13 +65,17 @@ export default function TabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Perfil',
+            title: "Perfil",
             tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account" size={size} color={color} />
+              <MaterialCommunityIcons
+                name="account"
+                size={size}
+                color={color}
+              />
             ),
           }}
         />
       </Tabs>
     </SafeAreaView>
   );
-} 
+}

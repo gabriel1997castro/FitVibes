@@ -102,6 +102,18 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="groups/[id]/balance"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/settings"
+        options={{
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
         name="groups/create"
         options={{
           headerTitle: "",
