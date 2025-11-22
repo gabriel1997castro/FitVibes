@@ -3,7 +3,7 @@
 FitVibes é um aplicativo social e gamificado para incentivar grupos de pessoas a manterem uma rotina de exercícios físicos através de pressão social positiva, desafios e recompensas simbólicas.
 
 ## Images
-### IMPORTANT -> IT IS STILL IN PROGRESS.
+### IMPORTANT -> IN PROGRESS.
 <div>
     <img height="600" alt="IMG_9868" src="https://github.com/user-attachments/assets/dccd99d2-511e-4927-b9af-acf4e3601c14" />
     <img height="600" alt="IMG_9869" src="https://github.com/user-attachments/assets/d016662a-91a7-4029-b9ce-51d74095d890" />
